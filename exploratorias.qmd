@@ -1,0 +1,9 @@
+---
+title: "Análises exploratórias e inferenciais"
+editor_options: 
+  chunk_output_type: console
+---
+
+# Criando gráficos com o ggplot2
+
+Iniciaremos essa sessão do caderno de aulas com alguns comandos para gerar gráficos utilizando o pacote "ggplot2"

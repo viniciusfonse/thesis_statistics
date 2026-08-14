@@ -1,0 +1,25 @@
+---
+about: 
+  template: jolla
+  id: about-block
+  image: "img/vinicius.jpg"
+  image-shape: round
+  links:
+    - icon: github
+      text: GitHub
+      href: https://github.com/viniciusfonse
+    - icon: envelope
+      text: Email
+      href: "mailto:fonseca.vinicius844@gmail.com"
+---
+
+::: {#about-block}
+:::
+
+# Bem-vindo ao meu website!
+
+Eu sou [Vinícius Fonsêca dos Santos]{.underline}, doutorando do [programa de pós-graduação em Entomologia](https://www.pos.entomologia.ufv.br/) da [Universidade Federal de Viçosa](https://www.ufv.br/campus-vicosa/). Eu possuo graduação em Engenharia Agronômica pela [Universidade Federal do Espírito Santo](https://www.ufes.br/) (São Mateus, ES) e mestrado em Entomologia (2023) pela Universidade Federal de Viçosa.
+
+Este website foi criado por mim em Quarto Markdown para a disciplina FIP606 - **Análise e visualização de dados em Fitopatologia**, ministrada pelo professor [Emerson Del Ponte](https://emersondelponte.netlify.app/). Neste site, você encontrará o material das aulas ministradas organizados em tópicos.
+
+Fique à vontade para explorar os conteúdos e utilizar os exemplos apresentados. Este site foi pensado como um repositório de aprendizado e prática em ciência de dados, com ênfase no uso do R e de ferramentas modernas de visualização. Espero que o material aqui disponibilizado seja útil para seus estudos ou projetos. Caso tenha dúvidas, sugestões ou queira trocar ideias, sinta-se livre para entrar em contato!

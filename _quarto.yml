@@ -1,0 +1,44 @@
+project:
+  type: website
+  output-dir: docs
+
+execute: 
+  cache: true
+  freeze: auto
+  
+website:
+  title: "Thesis Statistics — Vinícius Fonsêca"
+  favicon: img/estatistica.png
+  image: img/vinicius.png
+  
+  navbar:
+    pinned: true
+    logo: img/estatistica.png
+    left:
+     - text: Aprendendo o básico do R
+       href: basico.qmd
+     - text: Análises Estatísticas
+       href: exploratorias.qmd
+     - text: Construção de mapas
+       href: mapa.qmd
+  
+    right: 
+     - icon: github
+       href: https://github.com/viniciusfonse
+
+  page-navigation: true
+  page-footer: 
+    center: "Copyright 2026, Vinícius Fonsêca dos Santos"
+    background: light
+
+format:
+  html:
+    fontsize: 1.1em
+    theme: 
+      light: flatly
+      dark: darkly
+    css: styles.css
+    toc: true
+    warning: false
+
+editor: visual
