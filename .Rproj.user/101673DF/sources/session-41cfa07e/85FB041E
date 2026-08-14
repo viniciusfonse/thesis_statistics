@@ -3,7 +3,7 @@
     "path": "C:/Users/fonse/OneDrive/Doutorado/Tese/statistical_analysis/_quarto.yml",
     "project_path": "_quarto.yml",
     "type": "yaml",
-    "hash": "0",
+    "hash": "937947985",
     "contents": "",
     "dirty": false,
     "created": 1786731081865.0,
@@ -12,15 +12,15 @@
     "properties": {
         "source_window_id": "",
         "Source": "Source",
-        "cursorPosition": "9,9",
-        "scrollLine": "4"
+        "cursorPosition": "30,41",
+        "scrollLine": "19"
     },
     "folds": "",
-    "lastKnownWriteTime": 1786731043,
+    "lastKnownWriteTime": 1786734534,
     "encoding": "UTF-8",
     "collab_server": "",
     "source_window": "",
-    "last_content_update": 1786731043,
+    "last_content_update": 1786734534202,
     "read_only": false,
     "read_only_alternatives": []
 }

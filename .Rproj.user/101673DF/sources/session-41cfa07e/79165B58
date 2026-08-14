@@ -1,12 +1,12 @@
 {
-    "id": "8D5E8B2B",
+    "id": "79165B58",
     "path": "C:/Users/fonse/OneDrive/Doutorado/Tese/statistical_analysis/index.qmd",
     "project_path": "index.qmd",
     "type": "quarto_markdown",
-    "hash": "4219872309",
+    "hash": "3496195417",
     "contents": "",
     "dirty": false,
-    "created": 1786731090778.0,
+    "created": 1786734484806.0,
     "source_on_save": false,
     "relative_order": 2,
     "properties": {
@@ -16,16 +16,16 @@
         "rmdVisualWrapConfigured": "true",
         "docOutlineVisible": "1",
         "rmdVisualCollapsedChunks": "",
-        "rmdVisualModeLocation": "2:0",
+        "rmdVisualModeLocation": "2:243",
         "cursorPosition": "0,0",
-        "scrollLine": "12"
+        "scrollLine": "0"
     },
     "folds": "",
-    "lastKnownWriteTime": 1786732434,
+    "lastKnownWriteTime": 1786734493,
     "encoding": "UTF-8",
     "collab_server": "",
     "source_window": "",
-    "last_content_update": 1786732434277,
+    "last_content_update": 1786734493428,
     "read_only": false,
     "read_only_alternatives": []
 }

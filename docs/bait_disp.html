@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Construção de mapas no R – Thesis Statistics — Vinícius Fonsêca</title>
+<title>Análises exploratórias e inferenciais – Thesis Statistics — Vinícius Fonsêca</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -263,16 +263,16 @@ ul.task-list li input[type="checkbox"] {
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-    <a class="nav-link" href="./basico.html"> 
-<span class="menu-text">Aprendendo o básico do R</span></a>
+    <a class="nav-link" href="./coll_defe.html"> 
+<span class="menu-text">Collective defenses</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./exploratorias.html"> 
-<span class="menu-text">Análises Estatísticas</span></a>
+    <a class="nav-link active" href="./bait_disp.html" aria-current="page"> 
+<span class="menu-text">Bait dispersal</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link active" href="./mapa.html" aria-current="page"> 
-<span class="menu-text">Construção de mapas</span></a>
+    <a class="nav-link" href="./subs_sele.html"> 
+<span class="menu-text">Substrate Selection</span></a>
   </li>  
 </ul>
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
@@ -298,7 +298,7 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#importando-os-dados" id="toc-importando-os-dados" class="nav-link active" data-scroll-target="#importando-os-dados">Importando os dados</a></li>
+  <li><a href="#criando-gráficos-com-o-ggplot2" id="toc-criando-gráficos-com-o-ggplot2" class="nav-link active" data-scroll-target="#criando-gráficos-com-o-ggplot2">Criando gráficos com o ggplot2</a></li>
   </ul>
 </nav>
     </div>
@@ -308,7 +308,7 @@ ul.task-list li input[type="checkbox"] {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Construção de mapas no R</h1>
+<h1 class="title">Análises exploratórias e inferenciais</h1>
 </div>
 
 
@@ -325,10 +325,9 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<p>Para a construção de mapas, utilizaremos o conjunto de dados da ferrugem do café na Etiópia que está no arquivo de dados na nuvem.</p>
-<section id="importando-os-dados" class="level1">
-<h1>Importando os dados</h1>
-<p>Usaremos a função gsheet2tbl() do pacote [gsheet] para carregar os dados no ambiente</p>
+<section id="criando-gráficos-com-o-ggplot2" class="level1">
+<h1>Criando gráficos com o ggplot2</h1>
+<p>Iniciaremos essa sessão do caderno de aulas com alguns comandos para gerar gráficos utilizando o pacote “ggplot2”</p>
 
 
 </section>

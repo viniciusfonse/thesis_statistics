@@ -262,16 +262,16 @@ ul.task-list li input[type="checkbox"] {
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-    <a class="nav-link" href="./basico.html"> 
-<span class="menu-text">Aprendendo o básico do R</span></a>
+    <a class="nav-link" href="./coll_defe.html"> 
+<span class="menu-text">Collective defenses</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./exploratorias.html"> 
-<span class="menu-text">Análises Estatísticas</span></a>
+    <a class="nav-link" href="./bait_disp.html"> 
+<span class="menu-text">Bait dispersal</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./mapa.html"> 
-<span class="menu-text">Construção de mapas</span></a>
+    <a class="nav-link" href="./subs_sele.html"> 
+<span class="menu-text">Substrate Selection</span></a>
   </li>  
 </ul>
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
@@ -297,7 +297,11 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#bem-vindo-ao-meu-website" id="toc-bem-vindo-ao-meu-website" class="nav-link active" data-scroll-target="#bem-vindo-ao-meu-website">Bem-vindo ao meu website!</a></li>
+  <li><a href="#welcome" id="toc-welcome" class="nav-link active" data-scroll-target="#welcome">Welcome!</a>
+  <ul class="collapse">
+  <li><a href="#about-this-website" id="toc-about-this-website" class="nav-link" data-scroll-target="#about-this-website">About This Website</a></li>
+  <li><a href="#research-overview" id="toc-research-overview" class="nav-link" data-scroll-target="#research-overview">Research Overview</a></li>
+  </ul></li>
   </ul>
 </nav>
     </div>
@@ -323,17 +327,32 @@ ul.task-list li input[type="checkbox"] {
     <i class="bi bi-envelope"></i>
      <span class="about-link-text">Email</span>
   </a>
+  <a href="https://1drv.ms/f/c/1060e99ed39a3d06/IgBOvnUUNXlVTIXGyyZFWMSWASsJlNH4MoLfxQKexC8lueY?e=3UaeEP" class="about-link" rel="" target="">
+    <i class="bi bi-archive"></i>
+     <span class="about-link-text">Arquivos da tese</span>
+  </a>
 </div>
 </div>
 
-<section id="bem-vindo-ao-meu-website" class="level1">
-<h1>Bem-vindo ao meu website!</h1>
-<p>Eu sou <u>Vinícius Fonsêca dos Santos</u>, doutorando do <a href="https://www.pos.entomologia.ufv.br/">programa de pós-graduação em Entomologia</a> da <a href="https://www.ufv.br/campus-vicosa/">Universidade Federal de Viçosa</a>. Eu possuo graduação em Engenharia Agronômica pela <a href="https://www.ufes.br/">Universidade Federal do Espírito Santo</a> (São Mateus, ES) e mestrado em Entomologia (2023) pela Universidade Federal de Viçosa.</p>
-<p>Este website foi criado por mim em Quarto Markdown para a disciplina FIP606 - <strong>Análise e visualização de dados em Fitopatologia</strong>, ministrada pelo professor <a href="https://emersondelponte.netlify.app/">Emerson Del Ponte</a>. Neste site, você encontrará o material das aulas ministradas organizados em tópicos.</p>
-<p>Fique à vontade para explorar os conteúdos e utilizar os exemplos apresentados. Este site foi pensado como um repositório de aprendizado e prática em ciência de dados, com ênfase no uso do R e de ferramentas modernas de visualização. Espero que o material aqui disponibilizado seja útil para seus estudos ou projetos. Caso tenha dúvidas, sugestões ou queira trocar ideias, sinta-se livre para entrar em contato!</p>
+<section id="welcome" class="level1">
+<h1>Welcome!</h1>
+<p>I am <u>Vinícius Fonsêca dos Santos</u>, a Ph.D.&nbsp;candidate in the <a href="https://www.pos.entomologia.ufv.br/">Graduate Program in Entomology</a> at the <a href="https://www.ufv.br/campus-vicosa/">Universidade Federal de Viçosa</a> (UFV), Brazil. I hold a B.Sc. in Agronomy from the <a href="https://www.ufes.br/">Universidade Federal do Espírito Santo</a> (UFES) and an M.Sc. in Entomology (2023) from UFV.</p>
+<hr>
+<section id="about-this-website" class="level2">
+<h2 data-anchor-id="about-this-website">About This Website</h2>
+<p>This website serves as an open science and reproducible digital notebook hosting the <strong>statistical analyses and data visualizations for my Ph.D.&nbsp;thesis</strong>. Built using Quarto and R, it organizes experimental workflows, statistical models, and graphical outputs in a structured and transparent format.</p>
+<hr>
+</section>
+<section id="research-overview" class="level2">
+<h2 data-anchor-id="research-overview">Research Overview</h2>
+<p>My doctoral research investigates the <strong>suppression of collective defenses and social immunity in leaf-cutting ants (<em>Atta sexdens</em>) when exposed to modulating plant substrates</strong>.</p>
+<p>Leaf-cutting ants are major agricultural and forestry pests in the Neotropics. Their ecological success and resilience against pest management strategies rely heavily on complex eusocial mechanisms—such as <strong>social immunity</strong> (grooming and pathogen decontamination) and <strong>strict substrate selection</strong> to protect their symbiotic fungus. However, certain botanical substrates, such as garden nasturtium (<em>Tropaeolum majus</em>), can bypass these defensive barriers and disrupt colony homeostasis.</p>
+<p>Key objectives of my thesis include: * <strong>Social Immunity &amp; Collective Defenses:</strong> Evaluating how continuous exposure to <em>T. majus</em> alters grooming behaviors, pathogen decontamination (<em>Metarhizium anisopliae</em>), and social network dynamics among nestmates[cite: 1]. * <strong>Bait Dissemination &amp; Caste Interactions:</strong> Analyzing how inter-caste interaction networks and the internal flow of toxic bait (<em>isocicloseram</em>) are modified following plant substrate exposure[cite: 1]. * <strong>Substrate Selection &amp; Risk Perception:</strong> Assessing whether exposed colonies lose their capacity to discriminate and reject unsuitable, toxic, or pathogen-contaminated plant materials[cite: 1].</p>
+<p>Feel free to explore the statistical code and visualizations! If you have any questions, suggestions, or ideas for scientific collaboration, please feel free to reach out.</p>
 
 
 
+</section>
 </section>
 
 </main> <!-- /main -->

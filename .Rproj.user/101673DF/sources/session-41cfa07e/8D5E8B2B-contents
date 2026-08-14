@@ -11,15 +11,35 @@ about:
     - icon: envelope
       text: Email
       href: "mailto:fonseca.vinicius844@gmail.com"
+    - icon: archive
+      text: Arquivos da tese
+      href: https://1drv.ms/f/c/1060e99ed39a3d06/IgBOvnUUNXlVTIXGyyZFWMSWASsJlNH4MoLfxQKexC8lueY?e=3UaeEP
 ---
 
 ::: {#about-block}
 :::
 
-# Bem-vindo ao meu website!
+# Welcome!
 
-Eu sou [Vinícius Fonsêca dos Santos]{.underline}, doutorando do [programa de pós-graduação em Entomologia](https://www.pos.entomologia.ufv.br/) da [Universidade Federal de Viçosa](https://www.ufv.br/campus-vicosa/). Eu possuo graduação em Engenharia Agronômica pela [Universidade Federal do Espírito Santo](https://www.ufes.br/) (São Mateus, ES) e mestrado em Entomologia (2023) pela Universidade Federal de Viçosa.
+I am [Vinícius Fonsêca dos Santos]{.underline}, a Ph.D. candidate in the [Graduate Program in Entomology](https://www.pos.entomologia.ufv.br/) at the [Universidade Federal de Viçosa](https://www.ufv.br/campus-vicosa/) (UFV), Brazil. I hold a B.Sc. in Agronomy from the [Universidade Federal do Espírito Santo](https://www.ufes.br/) (UFES) and an M.Sc. in Entomology (2023) from UFV.
 
-Este website foi criado por mim em Quarto Markdown para a disciplina FIP606 - **Análise e visualização de dados em Fitopatologia**, ministrada pelo professor [Emerson Del Ponte](https://emersondelponte.netlify.app/). Neste site, você encontrará o material das aulas ministradas organizados em tópicos.
+---
 
-Fique à vontade para explorar os conteúdos e utilizar os exemplos apresentados. Este site foi pensado como um repositório de aprendizado e prática em ciência de dados, com ênfase no uso do R e de ferramentas modernas de visualização. Espero que o material aqui disponibilizado seja útil para seus estudos ou projetos. Caso tenha dúvidas, sugestões ou queira trocar ideias, sinta-se livre para entrar em contato!
+## About This Website
+
+This website serves as an open science and reproducible digital notebook hosting the **statistical analyses and data visualizations for my Ph.D. thesis**. Built using Quarto and R, it organizes experimental workflows, statistical models, and graphical outputs in a structured and transparent format.
+
+---
+
+## Research Overview
+
+My doctoral research investigates the **suppression of collective defenses and social immunity in leaf-cutting ants (*Atta sexdens*) when exposed to modulating plant substrates**.
+
+Leaf-cutting ants are major agricultural and forestry pests in the Neotropics. Their ecological success and resilience against pest management strategies rely heavily on complex eusocial mechanisms—such as **social immunity** (grooming and pathogen decontamination) and **strict substrate selection** to protect their symbiotic fungus. However, certain botanical substrates, such as garden nasturtium (*Tropaeolum majus*), can bypass these defensive barriers and disrupt colony homeostasis.
+
+Key objectives of my thesis include:
+* **Social Immunity & Collective Defenses:** Evaluating how continuous exposure to *T. majus* alters grooming behaviors, pathogen decontamination (*Metarhizium anisopliae*), and social network dynamics among nestmates[cite: 1].
+* **Bait Dissemination & Caste Interactions:** Analyzing how inter-caste interaction networks and the internal flow of toxic bait (*isocicloseram*) are modified following plant substrate exposure[cite: 1].
+* **Substrate Selection & Risk Perception:** Assessing whether exposed colonies lose their capacity to discriminate and reject unsuitable, toxic, or pathogen-contaminated plant materials[cite: 1].
+
+Feel free to explore the statistical code and visualizations! If you have any questions, suggestions, or ideas for scientific collaboration, please feel free to reach out.

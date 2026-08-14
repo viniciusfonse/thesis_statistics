@@ -1,30 +1,44 @@
 [
   {
-    "objectID": "mapa.html",
-    "href": "mapa.html",
+    "objectID": "subs_sele.html",
+    "href": "subs_sele.html",
     "title": "Construção de mapas no R",
     "section": "",
     "text": "Para a construção de mapas, utilizaremos o conjunto de dados da ferrugem do café na Etiópia que está no arquivo de dados na nuvem.\n\nImportando os dados\nUsaremos a função gsheet2tbl() do pacote [gsheet] para carregar os dados no ambiente"
   },
   {
-    "objectID": "exploratorias.html",
-    "href": "exploratorias.html",
-    "title": "Análises exploratórias e inferenciais",
-    "section": "",
-    "text": "Criando gráficos com o ggplot2\nIniciaremos essa sessão do caderno de aulas com alguns comandos para gerar gráficos utilizando o pacote “ggplot2”"
-  },
-  {
-    "objectID": "basico.html",
-    "href": "basico.html",
+    "objectID": "coll_defe.html",
+    "href": "coll_defe.html",
     "title": "Introdução ao Software",
     "section": "",
     "text": "Para iniciar a nossa caminhada, vamos importar um conjunto de dados que está disponível no próprio R.\n\ndados &lt;- Orange #A partir desse comando estamos criando um objeto chamado \"dados\", que vai receber um conjunto de dados disponível no próprio R, chamado \"Orange\"\ndados #Visualizando o conteúdo do objeto \"dados\" que criamos\n\n   Tree  age circumference\n1     1  118            30\n2     1  484            58\n3     1  664            87\n4     1 1004           115\n5     1 1231           120\n6     1 1372           142\n7     1 1582           145\n8     2  118            33\n9     2  484            69\n10    2  664           111\n11    2 1004           156\n12    2 1231           172\n13    2 1372           203\n14    2 1582           203\n15    3  118            30\n16    3  484            51\n17    3  664            75\n18    3 1004           108\n19    3 1231           115\n20    3 1372           139\n21    3 1582           140\n22    4  118            32\n23    4  484            62\n24    4  664           112\n25    4 1004           167\n26    4 1231           179\n27    4 1372           209\n28    4 1582           214\n29    5  118            30\n30    5  484            49\n31    5  664            81\n32    5 1004           125\n33    5 1231           142\n34    5 1372           174\n35    5 1582           177\n\nplot(dados$circumference) #Esse comando plota um gráfico simples de dispersão da variável \"circumference\", presente no nosso conjunto de dados\n\n\n\n\n\n\n\n\nAgora vamos explorar algumas formas de manipular esse conjunto de dados, a fim de atender às necessidades do usuário"
   },
   {
+    "objectID": "bait_disp.html",
+    "href": "bait_disp.html",
+    "title": "Análises exploratórias e inferenciais",
+    "section": "",
+    "text": "Criando gráficos com o ggplot2\nIniciaremos essa sessão do caderno de aulas com alguns comandos para gerar gráficos utilizando o pacote “ggplot2”"
+  },
+  {
     "objectID": "index.html",
     "href": "index.html",
-    "title": "Bem-vindo ao meu website!",
+    "title": "Welcome!",
     "section": "",
-    "text": "GitHub\n  \n  \n    \n     Email\n  \n\n\n\n\nBem-vindo ao meu website!\nEu sou Vinícius Fonsêca dos Santos, doutorando do programa de pós-graduação em Entomologia da Universidade Federal de Viçosa. Eu possuo graduação em Engenharia Agronômica pela Universidade Federal do Espírito Santo (São Mateus, ES) e mestrado em Entomologia (2023) pela Universidade Federal de Viçosa.\nEste website foi criado por mim em Quarto Markdown para a disciplina FIP606 - Análise e visualização de dados em Fitopatologia, ministrada pelo professor Emerson Del Ponte. Neste site, você encontrará o material das aulas ministradas organizados em tópicos.\nFique à vontade para explorar os conteúdos e utilizar os exemplos apresentados. Este site foi pensado como um repositório de aprendizado e prática em ciência de dados, com ênfase no uso do R e de ferramentas modernas de visualização. Espero que o material aqui disponibilizado seja útil para seus estudos ou projetos. Caso tenha dúvidas, sugestões ou queira trocar ideias, sinta-se livre para entrar em contato!"
+    "text": "GitHub\n  \n  \n    \n     Email\n  \n  \n    \n     Arquivos da tese"
+  },
+  {
+    "objectID": "index.html#about-this-website",
+    "href": "index.html#about-this-website",
+    "title": "Welcome!",
+    "section": "About This Website",
+    "text": "About This Website\nThis website serves as an open science and reproducible digital notebook hosting the statistical analyses and data visualizations for my Ph.D. thesis. Built using Quarto and R, it organizes experimental workflows, statistical models, and graphical outputs in a structured and transparent format."
+  },
+  {
+    "objectID": "index.html#research-overview",
+    "href": "index.html#research-overview",
+    "title": "Welcome!",
+    "section": "Research Overview",
+    "text": "Research Overview\nMy doctoral research investigates the suppression of collective defenses and social immunity in leaf-cutting ants (Atta sexdens) when exposed to modulating plant substrates.\nLeaf-cutting ants are major agricultural and forestry pests in the Neotropics. Their ecological success and resilience against pest management strategies rely heavily on complex eusocial mechanisms—such as social immunity (grooming and pathogen decontamination) and strict substrate selection to protect their symbiotic fungus. However, certain botanical substrates, such as garden nasturtium (Tropaeolum majus), can bypass these defensive barriers and disrupt colony homeostasis.\nKey objectives of my thesis include: * Social Immunity & Collective Defenses: Evaluating how continuous exposure to T. majus alters grooming behaviors, pathogen decontamination (Metarhizium anisopliae), and social network dynamics among nestmates[cite: 1]. * Bait Dissemination & Caste Interactions: Analyzing how inter-caste interaction networks and the internal flow of toxic bait (isocicloseram) are modified following plant substrate exposure[cite: 1]. * Substrate Selection & Risk Perception: Assessing whether exposed colonies lose their capacity to discriminate and reject unsuitable, toxic, or pathogen-contaminated plant materials[cite: 1].\nFeel free to explore the statistical code and visualizations! If you have any questions, suggestions, or ideas for scientific collaboration, please feel free to reach out."
   }
 ]

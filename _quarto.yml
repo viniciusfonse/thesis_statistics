@@ -15,12 +15,12 @@ website:
     pinned: true
     logo: img/estatistica.png
     left:
-     - text: Aprendendo o básico do R
-       href: basico.qmd
-     - text: Análises Estatísticas
-       href: exploratorias.qmd
-     - text: Construção de mapas
-       href: mapa.qmd
+     - text: Collective defenses
+       href: coll_defe.qmd
+     - text: Bait dispersal
+       href: bait_disp.qmd
+     - text: Substrate Selection
+       href: subs_sele.qmd
   
     right: 
      - icon: github
