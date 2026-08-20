@@ -110,35 +110,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   }
 }</script>
 
-  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
-  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
-
-<script type="text/javascript">
-const typesetMath = (el) => {
-  if (window.MathJax) {
-    // MathJax Typeset
-    window.MathJax.typeset([el]);
-  } else if (window.katex) {
-    // KaTeX Render
-    var mathElements = el.getElementsByClassName("math");
-    var macros = [];
-    for (var i = 0; i < mathElements.length; i++) {
-      var texText = mathElements[i].firstChild;
-      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
-        window.katex.render(texText.data, mathElements[i], {
-          displayMode: mathElements[i].classList.contains('display'),
-          throwOnError: false,
-          macros: macros,
-          fleqn: false
-        });
-      }
-    }
-  }
-}
-window.Quarto = {
-  typesetMath
-};
-</script>
 
 <link rel="stylesheet" href="styles.css">
 </head>
@@ -369,8 +340,8 @@ window.Quarto = {
   <li><a href="#results" id="toc-results" class="nav-link" data-scroll-target="#results">Results</a>
   <ul class="collapse">
   <li><a href="#survival-curves-kaplan-meier" id="toc-survival-curves-kaplan-meier" class="nav-link" data-scroll-target="#survival-curves-kaplan-meier">Survival curves (Kaplan-Meier)</a></li>
-  <li><a href="#modelo-de-cox-misto-efeito-principal-interação" id="toc-modelo-de-cox-misto-efeito-principal-interação" class="nav-link" data-scroll-target="#modelo-de-cox-misto-efeito-principal-interação">Modelo de Cox misto (efeito principal + interação)</a></li>
   <li><a href="#mixed-effects-cox-model-main-effects-interaction" id="toc-mixed-effects-cox-model-main-effects-interaction" class="nav-link" data-scroll-target="#mixed-effects-cox-model-main-effects-interaction">Mixed-effects Cox model (main effects + interaction)</a></li>
+  <li><a href="#median-lethal-time-lt₅₀-estimation" id="toc-median-lethal-time-lt₅₀-estimation" class="nav-link" data-scroll-target="#median-lethal-time-lt₅₀-estimation">Median lethal time (LT₅₀) estimation</a></li>
   </ul></li>
   </ul></li>
   </ul>
@@ -403,14 +374,14 @@ window.Quarto = {
 <h1>Isolates selection</h1>
 <section id="rationale" class="level2">
 <h2 class="anchored" data-anchor-id="rationale">Rationale</h2>
-<p>The first phase of this study aimed to select an entomopathogenic fungal isolate to evaluate how a toxic substrate affects the collective immune defense of <em>Atta sexdens</em>.</p>
+<p>The first phase of this study aimed to <strong>select an entomopathogenic fungal isolate</strong> to evaluate how a toxic substrate affects the collective immune defense of <em>Atta sexdens</em>.</p>
 <p>Pathogenicity was evaluated on <em>A. sexdens</em> foragers exposed to five <em>Metarhizium robertsii</em> isolates—kindly provided by the <em>Laboratório de Interações Inseto-Microrganismos</em> at the <em>Universidade Federal de Viçosa</em>.</p>
-<p>Twenty-four hours prior to the bioassays, colonies were starved. Following starvation, colonies were randomly assigned to two groups and exposed to one of two substrate regimes for seven days: (i) 10.0 g of <em>Acalypha wilkesiana</em> leaves daily (control group), or (ii) 10.0 g of fresh <em>Tropaeolum majus</em> leaves daily, serving as a potential modulating agent of social defenses.</p>
-<p>After this period, individual ants from these colonies were immersed for two seconds in a conidial suspension at a concentration of 1x10^6 conidia/mL, containing distilled water and 0.01% Tween 80. Three control groups were evaluated: (1) an aqueous solution of 0.01% Tween 80 (vehicle control), (2) distilled water (negative control), and (3) a 0.0001% isocycloseram solution (positive control). Each treatment consisted of four replicates (Petri dishes) with five foragers each. Ants were housed in Petri dishes lined with moistened filter paper and maintained in a BOD incubator at 27 ± 2 °C, 70 ± 10% relative humidity, and continuous darkness (0:24 h L:D). The ants were starved throughout the 5-day evaluation period, and mortality was recorded daily. Dead individuals were immediately removed and transferred to individual moist chambers (microcentrifuge tubes containing cotton and autoclaved distilled water) to evaluate fungal sporulation (confirming mycosis).</p>
+<p>Twenty-four hours prior to the bioassays, colonies were starved. Following starvation, <strong>colonies were randomly assigned to two groups and exposed to one of two substrate regimes for seven days</strong>: (i) 10.0 g of <em>Acalypha wilkesiana</em> leaves daily (control group), or (ii) 10.0 g of fresh <em>Tropaeolum majus</em> leaves daily, serving as a potential modulating agent of social defenses.</p>
+<p>After this period, <strong>individual ants from these colonies were immersed for two seconds in a conidial suspension</strong> at a concentration of 1x10⁶ conidia/mL, containing distilled water and 0.01% Tween 80. <strong>Three control groups were evaluated</strong>: (1) an aqueous solution of 0.01% Tween 80 (vehicle control), (2) distilled water (negative control), and (3) a 0.0001% isocycloseram solution (positive control). Each treatment consisted of four replicates (Petri dishes) with five foragers each. Ants were housed in Petri dishes lined with moistened filter paper and maintained in a BOD incubator at 27 ± 2 °C, 70 ± 10% relative humidity, and continuous darkness (0:24 h L:D). The ants were starved throughout the <strong>4-day evaluation period</strong>, and mortality was recorded daily. Dead individuals were immediately removed and transferred to individual moist chambers (microcentrifuge tubes containing cotton and autoclaved distilled water) to evaluate fungal sporulation (confirming mycosis).</p>
 </section>
 <section id="statistical-analysis" class="level2">
 <h2 class="anchored" data-anchor-id="statistical-analysis">Statistical analysis</h2>
-<p>The statistical analysis for the pathogenicity bioassay data was conducted in R using a multi-step framework. Survival curves were generated using the Kaplan–Meier estimator and compared across isolates and controls via the log-rank test to evaluate daily mortality rates. To quantify the hazard ratios (HR) of substrate type, fungal treatment, and their interaction (substrate:treatment), a mixed-effects Cox proportional hazards model (<code>coxme</code>) was fitted, specifying the Petri dish (replicate) as a random effect to account for pseudo-replication. Finally, the median lethal time (<span class="math inline">\(\text{LT}_{50}\)</span>) for each treatment combination was estimated using dose-response modeling via the <code>drc</code> package.</p>
+<p>The statistical analysis for the pathogenicity bioassay data was conducted in R using a multi-step framework. Survival curves were generated using the Kaplan–Meier estimator and compared across isolates and controls via the log-rank test to evaluate daily mortality rates. To quantify the hazard ratios (HR) of substrate type, fungal treatment, and their interaction (substrate:treatment), a mixed-effects Cox proportional hazards model (<code>coxme</code>) was fitted, specifying the Petri dish (replicate) as a random effect to account for pseudo-replication. Finally, the median lethal time (LT₅₀) for each treatment combination was estimated using dose-response modeling via the <code>drc</code> package.</p>
 </section>
 <section id="results" class="level2">
 <h2 class="anchored" data-anchor-id="results">Results</h2>
@@ -500,8 +471,8 @@ inter=trop_twee 20       20     13.0   3.76980    7.4241
 </div>
 </div>
 </section>
-<section id="modelo-de-cox-misto-efeito-principal-interação" class="level3">
-<h3 class="anchored" data-anchor-id="modelo-de-cox-misto-efeito-principal-interação">Modelo de Cox misto (efeito principal + interação)</h3>
+<section id="mixed-effects-cox-model-main-effects-interaction" class="level3">
+<h3 class="anchored" data-anchor-id="mixed-effects-cox-model-main-effects-interaction">Mixed-effects Cox model (main effects + interaction)</h3>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>fit_cox <span class="ot">&lt;-</span> <span class="fu">coxme</span>(surv_obj <span class="sc">~</span> substrate <span class="sc">*</span> treatment <span class="sc">+</span> (<span class="dv">1</span> <span class="sc">|</span> id_placa), <span class="at">data =</span> dados)</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(fit_cox)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -539,8 +510,8 @@ substratetrop:treatmenttwee  1.2477    3.4822   0.6032  2.07 0.0386</code></pre>
 </div>
 </div>
 </section>
-<section id="mixed-effects-cox-model-main-effects-interaction" class="level3">
-<h3 class="anchored" data-anchor-id="mixed-effects-cox-model-main-effects-interaction">Mixed-effects Cox model (main effects + interaction)</h3>
+<section id="median-lethal-time-lt₅₀-estimation" class="level3">
+<h3 class="anchored" data-anchor-id="median-lethal-time-lt₅₀-estimation">Median lethal time (LT₅₀) estimation</h3>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>lt50_matrix <span class="ot">&lt;-</span> <span class="fu">quantile</span>(fit_km, <span class="at">probs =</span> <span class="fl">0.5</span>)<span class="sc">$</span>quantile</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
@@ -571,7 +542,7 @@ substratetrop:treatmenttwee  1.2477    3.4822   0.6032  2.07 0.0386</code></pre>
 16       trop_twee       2.0</code></pre>
 </div>
 </div>
-<p>Fungal pathogenicity and substrate interaction significantly affected <em>Atta sexdens</em> forager survival over time (Log-rank <span class="math inline">\(\chi^2 = 76.6\)</span>, <span class="math inline">\(\text{df} = 15\)</span>, <span class="math inline">\(p &lt; 0.001\)</span>). The mixed-effects Cox proportional hazards model revealed a significant interaction between substrate type and fungal isolate on mortality hazard (<span class="math inline">\(p = 0.0122\)</span>). Specifically, exposure to isolate i94 on Tropaeolum majus substrate increased the mortality risk 4.7-fold (<span class="math inline">\(\text{HR} = 4.70\)</span>, <span class="math inline">\(z = 2.51\)</span>, <span class="math inline">\(p = 0.0122\)</span>) relative to control conditions. On the control substrate, isolate i33 displayed the highest independent toxicity (<span class="math inline">\(\text{HR} = 2.58\)</span>, <span class="math inline">\(z = 2.28\)</span>, <span class="math inline">\(p = 0.0223\)</span>). High overall mortality across treatments reached saturation by day 5, confirming the hazard rate analysis as the primary driver of differential pathogenicity.</p>
+<p>Fungal pathogenicity and substrate interaction significantly affected Atta sexdens forager survival over time (Log-rank χ2 = 76.6, df = 15, p &lt; 0.001). The mixed-effects Cox proportional hazards model revealed a significant interaction between substrate type and fungal isolate on mortality hazard (p = 0.0122). Specifically, exposure to isolate i94 on Tropaeolum majus substrate increased mortality risk 4.7-fold (HR = 4.70, z = 2.51, p = 0.0122) relative to control conditions. On the control substrate, isolate i33 displayed the highest independent toxicity (HR = 2.58, z = 2.28, p = 0.0223). Overall mortality was high across treatments and approached saturation by day 5, supporting the Cox proportional hazards analysis as the primary approach for assessing differences in mortality risk among treatments.</p>
 
 
 </section>

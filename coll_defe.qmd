@@ -8,21 +8,21 @@ editor_options:
 
 ## Rationale
 
-The first phase of this study aimed to select an entomopathogenic fungal isolate to evaluate how a toxic substrate affects the collective immune defense of *Atta sexdens*.
+The first phase of this study aimed to **select an entomopathogenic fungal isolate** to evaluate how a toxic substrate affects the collective immune defense of *Atta sexdens*.
 
 Pathogenicity was evaluated on *A. sexdens* foragers exposed to five *Metarhizium robertsii* isolates—kindly provided by the *Laboratório de Interações Inseto-Microrganismos* at the *Universidade Federal de Viçosa*.
 
-Twenty-four hours prior to the bioassays, colonies were starved. Following starvation, colonies were randomly assigned to two groups and exposed to one of two substrate regimes for seven days: (i) 10.0 g of *Acalypha wilkesiana* leaves daily (control group), or (ii) 10.0 g of fresh *Tropaeolum majus* leaves daily, serving as a potential modulating agent of social defenses.
+Twenty-four hours prior to the bioassays, colonies were starved. Following starvation, **colonies were randomly assigned to two groups and exposed to one of two substrate regimes for seven days**: (i) 10.0 g of *Acalypha wilkesiana* leaves daily (control group), or (ii) 10.0 g of fresh *Tropaeolum majus* leaves daily, serving as a potential modulating agent of social defenses.
 
-After this period, individual ants from these colonies were immersed for two seconds in a conidial suspension at a concentration of 1x10\^6 conidia/mL, containing distilled water and 0.01% Tween 80. Three control groups were evaluated: (1) an aqueous solution of 0.01% Tween 80 (vehicle control), (2) distilled water (negative control), and (3) a 0.0001% isocycloseram solution (positive control). Each treatment consisted of four replicates (Petri dishes) with five foragers each. Ants were housed in Petri dishes lined with moistened filter paper and maintained in a BOD incubator at 27 ± 2 °C, 70 ± 10% relative humidity, and continuous darkness (0:24 h L:D). The ants were starved throughout the 5-day evaluation period, and mortality was recorded daily. Dead individuals were immediately removed and transferred to individual moist chambers (microcentrifuge tubes containing cotton and autoclaved distilled water) to evaluate fungal sporulation (confirming mycosis).
+After this period, **individual ants from these colonies were immersed for two seconds in a conidial suspension** at a concentration of 1x10⁶ conidia/mL, containing distilled water and 0.01% Tween 80. **Three control groups were evaluated**: (1) an aqueous solution of 0.01% Tween 80 (vehicle control), (2) distilled water (negative control), and (3) a 0.0001% isocycloseram solution (positive control). Each treatment consisted of four replicates (Petri dishes) with five foragers each. Ants were housed in Petri dishes lined with moistened filter paper and maintained in a BOD incubator at 27 ± 2 °C, 70 ± 10% relative humidity, and continuous darkness (0:24 h L:D). The ants were starved throughout the **4-day evaluation period**, and mortality was recorded daily. Dead individuals were immediately removed and transferred to individual moist chambers (microcentrifuge tubes containing cotton and autoclaved distilled water) to evaluate fungal sporulation (confirming mycosis).
 
 ## Statistical analysis
 
-The statistical analysis for the pathogenicity bioassay data was conducted in R using a multi-step framework. Survival curves were generated using the Kaplan–Meier estimator and compared across isolates and controls via the log-rank test to evaluate daily mortality rates. To quantify the hazard ratios (HR) of substrate type, fungal treatment, and their interaction (substrate:treatment), a mixed-effects Cox proportional hazards model (`coxme`) was fitted, specifying the Petri dish (replicate) as a random effect to account for pseudo-replication. Finally, the median lethal time ($\text{LT}_{50}$) for each treatment combination was estimated using dose-response modeling via the `drc` package.
+The statistical analysis for the pathogenicity bioassay data was conducted in R using a multi-step framework. Survival curves were generated using the Kaplan–Meier estimator and compared across isolates and controls via the log-rank test to evaluate daily mortality rates. To quantify the hazard ratios (HR) of substrate type, fungal treatment, and their interaction (substrate:treatment), a mixed-effects Cox proportional hazards model (`coxme`) was fitted, specifying the Petri dish (replicate) as a random effect to account for pseudo-replication. Finally, the median lethal time (LT₅₀) for each treatment combination was estimated using dose-response modeling via the `drc` package.
 
 ## Results
 
-Instalando e carregando os pacotes 
+Instalando e carregando os pacotes
 
 ```{r}
 library(readxl) #leitura do arquivo excel
@@ -82,14 +82,14 @@ ggsurvplot(
 )
 ```
 
-### Modelo de Cox misto (efeito principal + interação)
+### Mixed-effects Cox model (main effects + interaction)
 
 ```{r}
 fit_cox <- coxme(surv_obj ~ substrate * treatment + (1 | id_placa), data = dados)
 summary(fit_cox)
 ```
 
-### Mixed-effects Cox model (main effects + interaction)
+### Median lethal time (LT₅₀) estimation
 
 ```{r}
 lt50_matrix <- quantile(fit_km, probs = 0.5)$quantile
@@ -103,4 +103,4 @@ lt50_table <- data.frame(
 print(lt50_table)
 ```
 
-Fungal pathogenicity and substrate interaction significantly affected *Atta sexdens* forager survival over time (Log-rank $\chi^2 = 76.6$, $\text{df} = 15$, $p < 0.001$). The mixed-effects Cox proportional hazards model revealed a significant interaction between substrate type and fungal isolate on mortality hazard ($p = 0.0122$). Specifically, exposure to isolate i94 on Tropaeolum majus substrate increased the mortality risk 4.7-fold ($\text{HR} = 4.70$, $z = 2.51$, $p = 0.0122$) relative to control conditions. On the control substrate, isolate i33 displayed the highest independent toxicity ($\text{HR} = 2.58$, $z = 2.28$, $p = 0.0223$). High overall mortality across treatments reached saturation by day 5, confirming the hazard rate analysis as the primary driver of differential pathogenicity.
+Fungal pathogenicity and substrate interaction significantly affected Atta sexdens forager survival over time (Log-rank χ2 = 76.6, df = 15, p \< 0.001). The mixed-effects Cox proportional hazards model revealed a significant interaction between substrate type and fungal isolate on mortality hazard (p = 0.0122). Specifically, exposure to isolate i94 on Tropaeolum majus substrate increased mortality risk 4.7-fold (HR = 4.70, z = 2.51, p = 0.0122) relative to control conditions. On the control substrate, isolate i33 displayed the highest independent toxicity (HR = 2.58, z = 2.28, p = 0.0223). Overall mortality was high across treatments and approached saturation by day 5, supporting the Cox proportional hazards analysis as the primary approach for assessing differences in mortality risk among treatments.
