@@ -1,16 +1,106 @@
 ---
-title: "Introdução ao Software"
+title: "Collective defense strategies"
 editor_options: 
   chunk_output_type: console
 ---
 
-Para iniciar a nossa caminhada, vamos importar um conjunto de dados que está disponível no próprio R.
+# Isolates selection
+
+## Rationale
+
+The first phase of this study aimed to select an entomopathogenic fungal isolate to evaluate how a toxic substrate affects the collective immune defense of *Atta sexdens*.
+
+Pathogenicity was evaluated on *A. sexdens* foragers exposed to five *Metarhizium robertsii* isolates—kindly provided by the *Laboratório de Interações Inseto-Microrganismos* at the *Universidade Federal de Viçosa*.
+
+Twenty-four hours prior to the bioassays, colonies were starved. Following starvation, colonies were randomly assigned to two groups and exposed to one of two substrate regimes for seven days: (i) 10.0 g of *Acalypha wilkesiana* leaves daily (control group), or (ii) 10.0 g of fresh *Tropaeolum majus* leaves daily, serving as a potential modulating agent of social defenses.
+
+After this period, individual ants from these colonies were immersed for two seconds in a conidial suspension at a concentration of 1x10\^6 conidia/mL, containing distilled water and 0.01% Tween 80. Three control groups were evaluated: (1) an aqueous solution of 0.01% Tween 80 (vehicle control), (2) distilled water (negative control), and (3) a 0.0001% isocycloseram solution (positive control). Each treatment consisted of four replicates (Petri dishes) with five foragers each. Ants were housed in Petri dishes lined with moistened filter paper and maintained in a BOD incubator at 27 ± 2 °C, 70 ± 10% relative humidity, and continuous darkness (0:24 h L:D). The ants were starved throughout the 5-day evaluation period, and mortality was recorded daily. Dead individuals were immediately removed and transferred to individual moist chambers (microcentrifuge tubes containing cotton and autoclaved distilled water) to evaluate fungal sporulation (confirming mycosis).
+
+## Statistical analysis
+
+The statistical analysis for the pathogenicity bioassay data was conducted in R using a multi-step framework. Survival curves were generated using the Kaplan–Meier estimator and compared across isolates and controls via the log-rank test to evaluate daily mortality rates. To quantify the hazard ratios (HR) of substrate type, fungal treatment, and their interaction (substrate:treatment), a mixed-effects Cox proportional hazards model (`coxme`) was fitted, specifying the Petri dish (replicate) as a random effect to account for pseudo-replication. Finally, the median lethal time ($\text{LT}_{50}$) for each treatment combination was estimated using dose-response modeling via the `drc` package.
+
+## Results
+
+Instalando e carregando os pacotes 
 
 ```{r}
-dados <- Orange #A partir desse comando estamos criando um objeto chamado "dados", que vai receber um conjunto de dados disponível no próprio R, chamado "Orange"
-dados #Visualizando o conteúdo do objeto "dados" que criamos
-
-plot(dados$circumference) #Esse comando plota um gráfico simples de dispersão da variável "circumference", presente no nosso conjunto de dados
+library(readxl) #leitura do arquivo excel
+library(dplyr) #manipulação dos dados
+library(survival) #análise de sobrevivência
+library(survminer) #gráficos de sobrevivência
+#install.packages("coxme")
+library(coxme) #modelo de cox com efeitos aleatórios
+library(lme4) #modelos lineares generalizados mistos (glmm)
+library(car) #ANOVA tipo III para glmm
+#install.packages("emmeans")
+library(emmeans) #comparações mútiplas post-hoc
+#install.packages()
+library(drc) #curvas dose-resposta e cálculo de TL50
+library(tidyverse)
 ```
 
-Agora vamos explorar algumas formas de manipular esse conjunto de dados, a fim de atender às necessidades do usuário
+Lendo e preparando os dados
+
+```{r}
+dados <- read_excel("isolates_selection_bioassay_1.xlsx")
+
+#definindo as variáveis categóricas e criando um ID único por placa de Petri
+dados <- dados %>%
+  mutate(
+    substrate = as.factor(substrate),
+    treatment = as.factor(treatment),
+    inter     = as.factor(inter),
+    rep       = as.factor(rep),
+    id_placa  = as.factor(paste(inter, rep, sep = "_"))
+  )
+```
+
+### Survival curves (Kaplan-Meier)
+
+```{r}
+#criando o objeto de sobrevivência
+surv_obj <- Surv(time = dados$dias, event = dados$mortality)
+
+#curvas de sobrevivência por tratamento de interação
+fit_km <- survfit(surv_obj ~ inter, data = dados)
+
+#teste de Log-Rank
+logrank_test <- survdiff(surv_obj ~ inter, data = dados)
+print(logrank_test)
+
+#plotando a curva de sobrevivência
+ggsurvplot(
+  fit_km,
+  data = dados,
+  pval = TRUE,
+  risk.table = FALSE,
+  legend.title = "Treatments",
+  xlab = "Days",
+  ylab = "Survival probability",
+  ggtheme = theme_minimal()
+)
+```
+
+### Modelo de Cox misto (efeito principal + interação)
+
+```{r}
+fit_cox <- coxme(surv_obj ~ substrate * treatment + (1 | id_placa), data = dados)
+summary(fit_cox)
+```
+
+### Mixed-effects Cox model (main effects + interaction)
+
+```{r}
+lt50_matrix <- quantile(fit_km, probs = 0.5)$quantile
+
+lt50_table <- data.frame(
+  Treatment_Group = gsub("inter=", "", rownames(lt50_matrix)),
+  LT50_days = lt50_matrix[, 1],
+  row.names = NULL
+)
+
+print(lt50_table)
+```
+
+Fungal pathogenicity and substrate interaction significantly affected *Atta sexdens* forager survival over time (Log-rank $\chi^2 = 76.6$, $\text{df} = 15$, $p < 0.001$). The mixed-effects Cox proportional hazards model revealed a significant interaction between substrate type and fungal isolate on mortality hazard ($p = 0.0122$). Specifically, exposure to isolate i94 on Tropaeolum majus substrate increased the mortality risk 4.7-fold ($\text{HR} = 4.70$, $z = 2.51$, $p = 0.0122$) relative to control conditions. On the control substrate, isolate i33 displayed the highest independent toxicity ($\text{HR} = 2.58$, $z = 2.28$, $p = 0.0223$). High overall mortality across treatments reached saturation by day 5, confirming the hazard rate analysis as the primary driver of differential pathogenicity.
