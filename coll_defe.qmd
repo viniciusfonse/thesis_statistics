@@ -40,6 +40,116 @@ library(drc) #curvas dose-resposta e cálculo de TL50
 library(tidyverse)
 ```
 
+### Foraging data
+
+```{r}
+foraging_exp1 <- read_excel("foraging_bioassay_1.xlsx")
+
+ggplot(data = foraging_exp1, aes(x = real_consume, fill = substrate)) +
+    geom_histogram(alpha = .4) +
+    labs(title = "Histogram")
+
+ggplot(data = foraging_exp1, aes(x = day, y = real_consume, fill = substrate)) +
+    geom_point(shape = 21, size = 4, color = "black")
+
+ggplot(data = foraging_exp1, aes(x = day, y = real_consume,
+                            color = substrate, shape = substrate)) +
+    geom_point(size = 4, alpha = .7) +
+    geom_smooth(method = "lm", se = FALSE) +
+    scale_shape_manual(values = c(15, 17)) +
+    scale_color_manual(values = c("purple", "cyan4")) +
+    theme_bw(base_size = 16) +
+    labs(x = "day", y = "Substrate consume (g)", 
+         color = "substrate", shape = "substrate")
+```
+
+Para analisar dados de consumo diário com medições repetidas nas mesmas colônias ao longo de 7 dias, a abordagem ideal é utilizar um Modelo Linear Misto (LMM) para isolar a autocorrelação temporal das colônias e contornar o baixo poder estatístico inicial do tamanho amostral (n = 3 colônias por substrato).Estatística Descritiva e ExploratóriaMétricas Diárias: Calcule média, erro-padrão da média (EPM), mediana e amplitude interquartil de real_consume agrupados por substrate e day.Objetivo: Mapear a trajetória central do consumo ao longo do tempo e verificar a variabilidade inter-colonial de cada grupo, além de identificar eventuais outliers.Análise Inferencial: Modelo Linear Misto (LMM)Por que usar: Cada colônia foi medida 7 vezes consecutivas, violando a premissa de independência de uma ANOVA tradicional. O LMM insere colony como efeito aleatório $(1 \vert{} \text{colony})$ para controlar a variação individual, enquanto substrate e day entram como efeitos fixos testando a interação $\text{substrate} \times \text{day}$.Validação de Premissas: Avalie a normalidade dos resíduos do modelo via teste de Shapiro-Wilk. Caso os resíduos violem a normalidade, aplica-se transformação nos dados (ex: $\log(y + 1)$) ou utiliza-se um Modelo Linear Generalizado Misto (GLMM) com distribuição Gama.Estratégia de Visualização CientíficaPara relatórios ou publicações, o gráfico ideal combina a tendência central do tratamento com a variação individual de cada unidade experimental (spaghetti plot sobreposto por médias):Linhas finas e transparentes ao fundo: Trajetória individual diária das 6 colônias (mostra a variação biológica real).Linhas espessas em destaque: Média diária de cada substrato ao longo dos 7 dias.Sombreamento (Ribbon): Representação gráfica do Erro-Padrão da Média ($\pm \text{SE}$).
+
+```{r}
+# 1. Pacotes Necessários --------------------------------------------------
+if (!require("pacman")) install.packages("pacman")
+pacman::p_load(tidyverse, lme4, lmerTest, car, emmeans)
+
+# 2. Dados Exemplo (Substitua pela leitura do seu CSV) -------------------
+# dados <- read.csv("seu_arquivo.csv")
+
+set.seed(42)
+dados <- expand.grid(day = 1:7, colony = factor(1:6), substrate = c("Substrato_A", "Substrato_B")) %>%
+  filter((substrate == "Substrato_A" & colony %in% 1:3) | 
+         (substrate == "Substrato_B" & colony %in% 4:6)) %>%
+  mutate(real_consume = rnorm(n(), mean = ifelse(substrate == "Substrato_A", 10 + day*1.5, 8 + day*0.4), sd = 1.2))
+
+# 3. Estatística Descritiva -----------------------------------------------
+descritiva <- dados %>%
+  group_by(substrate, day) %>%
+  summarise(
+    n = n(),
+    media = mean(real_consume, na.rm = TRUE),
+    se = sd(real_consume, na.rm = TRUE) / sqrt(n),
+    mediana = median(real_consume, na.rm = TRUE),
+    .groups = "drop"
+  )
+
+print("--- RESUMO DESCRITIVO ---")
+print(descritiva)
+
+# 4. Modelo Linear Misto (LMM) -------------------------------------------
+dados$day_num <- as.numeric(dados$day)
+
+# Modelo testando efeito fixo do substrato, dia e interação, com efeito aleatório da colônia
+modelo <- lmer(real_consume ~ substrate * day_num + (1 | colony), data = dados)
+
+# Teste de Normalidade dos Resíduos
+print("--- NORMALIDADE DOS RESÍDUOS ---")
+print(shapiro.test(residuals(modelo)))
+
+# Tabela ANOVA (Tipo III)
+print("--- TABELA ANOVA (EFEITOS FIXOS) ---")
+print(Anova(modelo, type = "III"))
+
+# Médias Ajustadas e Comparações
+print("--- MÉDIAS AJUSTADAS (EMMEANS) ---")
+print(emmeans(modelo, ~ substrate | day_num))
+
+# 5. Visualização Científica (ggplot2) -----------------------------------
+grafico <- ggplot() +
+  # Trajetórias individuais de cada colônia
+  geom_line(data = dados, 
+            aes(x = day, y = real_consume, group = colony, color = substrate),
+            alpha = 0.35, linetype = "dashed", linewidth = 0.7) +
+  # Intervalo de erro-padrão
+  geom_ribbon(data = descritiva, 
+              aes(x = day, ymin = media - se, ymax = media + se, fill = substrate),
+              alpha = 0.2) +
+  # Linha média do substrato
+  geom_line(data = descritiva, 
+            aes(x = day, y = media, color = substrate, group = substrate),
+            linewidth = 1.2) +
+  geom_point(data = descritiva, 
+             aes(x = day, y = media, color = substrate), 
+             size = 3) +
+  # Estética e Escalas
+  scale_x_continuous(breaks = 1:7) +
+  scale_color_brewer(palette = "Set1", name = "Substrato") +
+  scale_fill_brewer(palette = "Set1", name = "Substrato") +
+  labs(
+    x = "Tempo de Exposição (Dias)",
+    y = "Consumo Real (g)",
+    title = "Dinâmica Diária de Forrageamento",
+    subtitle = "Média ± EPM (n = 3 colônias/substrato). Linhas pontilhadas indicam colônias individuais."
+  ) +
+  theme_classic(base_size = 12) +
+  theme(
+    legend.position = "top",
+    plot.title = element_text(face = "bold", size = 14),
+    axis.title = element_text(face = "bold")
+  )
+
+print(grafico)
+```
+
+### Survival curves (Kaplan-Meier)
+
 Lendo e preparando os dados
 
 ```{r}
@@ -55,9 +165,6 @@ dados <- dados %>%
     id_placa  = as.factor(paste(inter, rep, sep = "_"))
   )
 ```
-
-### Survival curves (Kaplan-Meier)
-
 ```{r}
 #criando o objeto de sobrevivência
 surv_obj <- Surv(time = dados$dias, event = dados$mortality)

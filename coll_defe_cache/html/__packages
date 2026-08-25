@@ -21,3 +21,5 @@ purrr
 stringr
 forcats
 lubridate
+pacman
+lmerTest
