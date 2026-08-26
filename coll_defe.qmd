@@ -284,7 +284,7 @@ ggsurvplot(
 )
 ```
 
-### Mixed-effects Cox model (main effects + interaction)
+#### Mixed-effects Cox model (main effects + interaction)
 
 A mixed-effects Cox proportional hazards model was fitted using the `coxme` package to assess the effects of substrate, fungal treatment, and their interaction on *Atta sexdens* forager mortality risk over time. Petri-dish replicate (`id_placa`) was included as a random effect to account for the non-independence of individuals within the same experimental unit. The model estimated hazard ratios (HR) for each treatment effect, allowing the relative risk of mortality to be quantified while accounting for variation among experimental replicates.
 
@@ -307,7 +307,7 @@ print(teste_ph)
 plot(teste_ph)
 ```
 
-### Median lethal time (LT₅₀) estimation
+#### Median lethal time (LT₅₀) estimation
 
 Median lethal time (LT₅₀) was estimated from the Kaplan–Meier survival curves by determining the time at which the estimated survival probability reached 50% for each treatment group. The resulting LT₅₀ values were organized into a table to facilitate comparisons of median survival time among treatment combinations.
 

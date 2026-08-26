@@ -370,8 +370,6 @@ window.Quarto = {
   <ul class="collapse">
   <li><a href="#foraging-data" id="toc-foraging-data" class="nav-link" data-scroll-target="#foraging-data">Foraging data</a></li>
   <li><a href="#survival-curves-kaplan-meier" id="toc-survival-curves-kaplan-meier" class="nav-link" data-scroll-target="#survival-curves-kaplan-meier">Survival curves (Kaplan-Meier)</a></li>
-  <li><a href="#mixed-effects-cox-model-main-effects-interaction" id="toc-mixed-effects-cox-model-main-effects-interaction" class="nav-link" data-scroll-target="#mixed-effects-cox-model-main-effects-interaction">Mixed-effects Cox model (main effects + interaction)</a></li>
-  <li><a href="#median-lethal-time-lt₅₀-estimation" id="toc-median-lethal-time-lt₅₀-estimation" class="nav-link" data-scroll-target="#median-lethal-time-lt₅₀-estimation">Median lethal time (LT₅₀) estimation</a></li>
   </ul></li>
   </ul></li>
   </ul>
@@ -925,9 +923,8 @@ inter=trop_twee 20       20     13.0   3.76980    7.4241
 </div>
 </div>
 </div>
-</section>
-<section id="mixed-effects-cox-model-main-effects-interaction" class="level3">
-<h3 class="anchored" data-anchor-id="mixed-effects-cox-model-main-effects-interaction">Mixed-effects Cox model (main effects + interaction)</h3>
+<section id="mixed-effects-cox-model-main-effects-interaction" class="level4">
+<h4 class="anchored" data-anchor-id="mixed-effects-cox-model-main-effects-interaction">Mixed-effects Cox model (main effects + interaction)</h4>
 <p>A mixed-effects Cox proportional hazards model was fitted using the <code>coxme</code> package to assess the effects of substrate, fungal treatment, and their interaction on <em>Atta sexdens</em> forager mortality risk over time. Petri-dish replicate (<code>id_placa</code>) was included as a random effect to account for the non-independence of individuals within the same experimental unit. The model estimated hazard ratios (HR) for each treatment effect, allowing the relative risk of mortality to be quantified while accounting for variation among experimental replicates.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>fit_cox <span class="ot">&lt;-</span> <span class="fu">coxme</span>(surv_obj <span class="sc">~</span> substrate <span class="sc">*</span> treatment <span class="sc">+</span> (<span class="dv">1</span> <span class="sc">|</span> id_placa), <span class="at">data =</span> dados)</span>
@@ -1006,8 +1003,8 @@ GLOBAL              24.7381 15 0.054</code></pre>
 </div>
 </div>
 </section>
-<section id="median-lethal-time-lt₅₀-estimation" class="level3">
-<h3 class="anchored" data-anchor-id="median-lethal-time-lt₅₀-estimation">Median lethal time (LT₅₀) estimation</h3>
+<section id="median-lethal-time-lt₅₀-estimation" class="level4">
+<h4 class="anchored" data-anchor-id="median-lethal-time-lt₅₀-estimation">Median lethal time (LT₅₀) estimation</h4>
 <p>Median lethal time (LT₅₀) was estimated from the Kaplan–Meier survival curves by determining the time at which the estimated survival probability reached 50% for each treatment group. The resulting LT₅₀ values were organized into a table to facilitate comparisons of median survival time among treatment combinations.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>lt50_matrix <span class="ot">&lt;-</span> <span class="fu">quantile</span>(fit_km, <span class="at">probs =</span> <span class="fl">0.5</span>)<span class="sc">$</span>quantile</span>
@@ -1042,6 +1039,7 @@ GLOBAL              24.7381 15 0.054</code></pre>
 <p>Fungal treatment effects on <em>A. sexdens</em> forager mortality risk were substrate-dependent for specific isolates (mixed-effects Cox proportional hazards model, integrated likelihood ratio χ² = 75.65, df = 16, p &lt; 0.001). The model revealed significant substrate × fungal treatment interactions for i94 (HR = 4.70, z = 2.51, p = 0.0122) and Tween (HR = 3.48, z = 2.07, p = 0.0386), indicating that their effects on mortality risk differed between substrates. Specifically, exposure to isolate i94 on <em>Tropaeolum majus</em> substrate showed a significantly stronger mortality hazard relative to its effect on the control substrate. On the control substrate, isolate i33 displayed the highest significant independent effect on mortality risk (HR = 2.59, z = 2.28, p = 0.0223). The main effect of substrate was not significant (HR = 1.16, z = 0.35, p = 0.724), indicating that substrate alone did not consistently alter mortality risk. Median lethal time (LT₅₀) varied among treatment combinations, ranging from 2 to 4 days, with the longest LT₅₀ observed for control–i94 and <em>T. majus</em>–i103. Overall, these results indicate that substrate modified the effects of specific fungal treatments on <em>A. sexdens</em> forager mortality rather than producing a consistent effect across all treatments.</p>
 
 
+</section>
 </section>
 </section>
 </section>
