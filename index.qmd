@@ -1,9 +1,9 @@
 ---
+title: Statistical Analyses — PhD Thesis
+
 about: 
   template: jolla
-  id: about-block
-  image: "img/vinicius.jpg"
-  image-shape: round
+  
   links:
     - icon: github
       text: GitHub
