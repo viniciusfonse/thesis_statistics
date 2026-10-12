@@ -24,3 +24,6 @@ lubridate
 pacman
 lmerTest
 DHARMa
+utf8
+broom
+glmmTMB

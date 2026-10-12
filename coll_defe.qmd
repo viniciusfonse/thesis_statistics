@@ -14,15 +14,11 @@ Pathogenicity was evaluated on *A. sexdens* foragers exposed to five *Metarhiziu
 
 Twenty-four hours prior to the bioassays, colonies were starved. Following starvation, **colonies were randomly assigned to two groups and exposed to one of two substrate regimes for seven days**: (i) 10.0 g of *Acalypha wilkesiana* leaves daily (control group), or (ii) 10.0 g of fresh *Tropaeolum majus* leaves daily, serving as a potential modulating agent of social defenses.
 
-After this period, **individual ants from these colonies were immersed for two seconds in a conidial suspension** at a concentration of 1x10⁶ conidia/mL, containing distilled water and 0.01% Tween 80. **Three control groups were evaluated**: (1) an aqueous solution of 0.01% Tween 80 (vehicle control), (2) distilled water (negative control), and (3) a 0.0001% isocycloseram solution (positive control). Each treatment consisted of four replicates (Petri dishes) with five foragers each. Ants were housed in Petri dishes lined with moistened filter paper and maintained in a BOD incubator at 27 ± 2 °C, 70 ± 10% relative humidity, and continuous darkness (0:24 h L:D). The ants were starved throughout the **4-day evaluation period**, and mortality was recorded daily. Dead individuals were immediately removed and transferred to individual moist chambers (microcentrifuge tubes containing cotton and autoclaved distilled water) to evaluate fungal sporulation (confirming mycosis).
+After this period, **individual ants from these colonies were immersed for two seconds in a conidial suspension** at a concentration of 1x10⁶ conidia/mL, containing distilled water and 0.01% Tween 80. **Three control groups were evaluated**: (1) an aqueous solution of 0.01% Tween 80 (vehicle control), (2) distilled water (negative control), and (3) a 0.1% isocycloseram solution (positive control). Each treatment consisted of four replicates (Petri dishes) with five foragers each. Ants were housed in Petri dishes lined with moistened filter paper and maintained in a BOD incubator at 27 ± 2 °C, 70 ± 10% relative humidity, and continuous darkness (0:24 h L:D). The ants were starved throughout the **5-day evaluation period**, and mortality was recorded daily. Dead individuals were immediately removed and transferred to individual moist chambers (microcentrifuge tubes containing cotton and autoclaved distilled water) to evaluate fungal sporulation (confirming mycosis).
 
-## Statistical analysis
+To ensure that colonies actively interacted with the provided substrates and to characterize potential sublethal behavioral effects during the 7-day pre-exposure period, daily foraging activity (leaf consumption) and waste production were monitored for each colony. Quantifying consumption confirmed whether *T. majus* induced feeding deterrence over time while maintaining active substrate intake, whereas waste accumulation served as a baseline indicator of colony maintenance and hygienic activity prior to pathogen exposure.
 
-The statistical analysis for the pathogenicity bioassay data was conducted in R using a multi-step framework. Survival curves were generated using the Kaplan–Meier estimator and compared across isolates and controls via the log-rank test to evaluate daily mortality rates. To quantify the hazard ratios (HR) of substrate type, fungal treatment, and their interaction (substrate:treatment), a mixed-effects Cox proportional hazards model (`coxme`) was fitted, specifying the Petri dish (replicate) as a random effect to account for pseudo-replication. Finally, the median lethal time (LT₅₀) for each treatment combination was estimated using dose-response modeling via the `drc` package.
-
-## Results
-
-Installing and loading packages.
+### Installing and loading packages.
 
 ```{r}
 library(readxl) #leitura de arquivos excel
@@ -41,19 +37,21 @@ library(drc) #curvas dose-resposta e cálculo de TL50
 library(tidyverse) #manipulação, visualização e análise de dados
 #install.packages("DHARMa")
 library(DHARMa)
+library(utf8)
+library(broom) # Para converter survfit em dataframe do ggplot
 ```
 
-### Foraging data
+## Foraging data
 
-#### Descritive statistic
+### Descritive statistic
 
 Descriptive statistics were calculated for each substrate and day, using colony-level observations as the experimental units.
 
 ```{r}
-foraging_exp1 <- read_excel("foraging_bioassay_1.xlsx")
+foraging_exp1 <- read_excel("foraging_bioassay_4.xlsx")
 
 #estatística descritiva
-descritiva <- foraging_exp1 %>%
+descritiva_forrag <- foraging_exp1 %>%
   group_by(substrate, day) %>%
   summarise(
     n = n(),
@@ -64,7 +62,7 @@ descritiva <- foraging_exp1 %>%
     .groups = "drop"
   )
 
-descritiva
+descritiva_forrag
 
 #histograma
 ggplot(foraging_exp1, aes(x = real_consume, fill = substrate)) +
@@ -78,9 +76,13 @@ ggplot(foraging_exp1, aes(x = day, y = real_consume, color = substrate, group = 
   labs(x = "Day", y = "Consumption")
 ```
 
-#### Inferencial statistics
+### Inferencial statistics
 
-Foraging activity data were analyzed using a linear mixed-effects model fitted with the `lmer` function. Experimental day was centered by subtracting 1 from the original day variable, so that day 1 represented time zero, facilitating the interpretation of the model intercept and treatment effects at the beginning of the experiment. The model included substrate, day, and their interaction as fixed effects, with colony included as a random intercept to account for the non-independence of repeated observations from the same colony. Model assumptions were assessed through visual inspection of residuals and Q–Q plots, the Shapiro–Wilk test for residual normality, and simulation-based residual diagnostics using the `DHARMa` package. Temporal dependence was further explored by examining residual autocorrelation within each colony using the autocorrelation function (ACF). Type III analysis of variance with Kenward–Roger-adjusted degrees of freedom was used to test the significance of the fixed effects. Estimated marginal means were obtained using the `emmeans` package to characterize predicted consumption for each substrate across experimental days, while `emtrends` was used to compare the temporal slopes of consumption between substrates, allowing assessment of whether consumption changed at different rates over time depending on substrate.
+Foraging activity (substrate consumption) and waste production data were analyzed using mixed-effects modeling frameworks in R. Experimental day was zero-indexed by subtracting 1 from the original day variable (`day_c = day - 1`), setting Day 1 as time zero to facilitate the interpretation of model intercepts and initial treatment effects. Model assumptions were evaluated through visual inspection of raw and simulated quantile residuals using the `DHARMa` package, as well as Shapiro–Wilk tests for residual normality.
+
+Foraging consumption data exhibited strong heteroscedasticity and non-normality when fitted with standard linear mixed models. Therefore, consumption was analyzed using a Generalized Linear Mixed Model (GLMM) via the `glmmTMB` package, specifying a Gamma distribution with a log-link function and a substrate-specific dispersion structure (`dispformula = ~ substrate`). Waste production met linear mixed model assumptions and was analyzed using a standard Linear Mixed Model (LMM) fitted with the `lmer` function from the `lme4` package. Both models included substrate, day (`day_c`), and their interaction as fixed effects, and colony as a random intercept to account for the non-independence of repeated observations from the same colony.
+
+Hypothesis testing was performed using Type III Wald $\chi^2$ tests via the `car` package. Estimated marginal means were obtained using the `emmeans` package to characterize predicted values across experimental days, while `emtrends` was used to compare the temporal slopes of consumption between substrates.
 
 ```{r}
 #centralização da variável para estabelecer o dia 1 como o tempo 0
@@ -88,27 +90,31 @@ foraging_exp1 <- foraging_exp1 %>%
   mutate(day_c = day - 1)
 
 #ajustando o modelo linear misto
-modelo <- lmer(
+modelo_consumo <- lmer(
   real_consume ~ substrate * day_c + (1 | colony),
   data = foraging_exp1
 )
-plot(modelo)
+plot(modelo_consumo)
 
 #verificando a normalidade dos resíduos do modelo
-print(shapiro.test(residuals(modelo)))
+print(shapiro.test(residuals(modelo_consumo)))
 
-qqnorm(residuals(modelo))
-qqline(residuals(modelo))
+qqnorm(residuals(modelo_consumo))
+qqline(residuals(modelo_consumo))
 
-simres <- simulateResiduals(modelo)
+# alguns valores de consumo são muito mais altos do que o modelo previa
+
+simres <- simulateResiduals(modelo_consumo)
 plot(simres)
+
+# O teste de Kolmogorov-Smirnov foi significativo (0,0062), confirmando que a distribuição teórica assumida pelo modelo não se adequa aos seus dados de consumo.Além disso, existe não-linearidade no padrão de consumo ao longo dos dias/substratos ou uma variância que muda dependendo do valor predito (heterocedasticidade).
 
 #organizando os resíduos do modelo
 residuos <- data.frame(
   colony = foraging_exp1$colony,
   substrate = foraging_exp1$substrate,
   day = foraging_exp1$day,
-  residual = residuals(modelo)
+  residual = residuals(modelo_consumo)
 )
 
 residuos %>%
@@ -121,46 +127,79 @@ ggplot(residuos, aes(x = day, y = residual)) +
   geom_point(size = 3) +
   facet_wrap(~ colony + substrate)
 
-#calculando a autocorrelação dos resíduos por colônia
-for (col in unique(residuos$colony)) {
-  cat("\n====================\n")
-  cat("Colônia:", col, "\n")
-  cat("====================\n")
-  r <- residuos %>%
-    filter(colony == col) %>%
-    arrange(day) %>%
-    pull(residual)
-  print(acf(r, plot = FALSE))
-}
-
-#ANOVA tipo III com teste F
-anova(modelo, type = 3, ddf = "Kenward-Roger")
-
-#médias marginais estimadas de consumo por substrato e dia
-emm_dias <- emmeans(
-  modelo,
-  ~ substrate | day_c,
-  at = list(day_c = 0:6)
-)
-print(emm_dias)
-
-#comparação das taxas de mudança no consumo entre substratos
-print(emtrends(modelo, pairwise ~ substrate, var = "day_c"))
+# Para o grupo controle, os resíduos são pequenos e estáveis, variando entre -0,36 e +0,29. Já para T. majus, os resíduos oscilam drasticamente, variando entre -1,29 e +2,81. Logo, esse modelo não é adequado para os dados porque: 1. A variância não é constante entre os tratamentos (Tropaeolum varia muito mais que controle) (heterocedasticidade estrutural). 2. A distribuição dos dados de consumo apresenta assimetria positiva (muitos valores pequenos/médios e picos altos no início do tratamento) (Não normalidade dos erros). 3. O consumo no tratamento Tropaeolum começa muito alto no Dia 1 e cai nos dias seguintes, gerando não-linearidade (padrão temporal no consumo).
 ```
 
-Foraging activity differed between substrates and changed differently over time. The linear mixed-effects model revealed a significant effect of substrate on consumption (Type III ANOVA, $F_{1,6.81} = 11.23$, $P = 0.0127$) and a significant substrate × day interaction ($F_{1,34} = 5.51$, $P = 0.0248$), whereas the main effect of day was not significant ($F_{1,34} = 0.26$, $P = 0.611$). Estimated marginal means indicated that consumption was consistently higher on the control substrate than on *T. majus*, with predicted consumption decreasing from 4.12 on day 1 to 2.59 on day 7 on *T. majus*, while increasing from 7.79 to 8.77 on the control substrate. Accordingly, estimated temporal slopes differed significantly between substrates ($P = 0.0248$), with consumption increasing by 0.164 grams per day on the control substrate but decreasing by 0.255 grams per day on *T. majus*. Residual diagnostics indicated no evidence of substantial deviation from normality (Shapiro–Wilk, $W = 0.984$, $P = 0.821$), and inspection of residual autocorrelation within colonies did not reveal a consistent temporal pattern.
+```{r}
+# Opção A
+
+# GLMM com distribuição Gamma
+# modelo_gamma <- glmer(
+#   real_consume ~ substrate * day_c + (1 | colony),
+#   data = foraging_exp1,
+#   family = Gamma(link = "log")
+# )
+
+# Validar com DHARMa
+#plot(simulateResiduals(modelo_gamma))
+
+# o algoritmo de otimização da função glmer não conseguiu encontrar uma solução matemática estável para os dados.
+```
+
+```{r}
+# Opção B
+
+#install.packages("glmmTMB")
+library(glmmTMB)
+
+# Permite variância residual diferente para cada substrato
+modelo_glmmTMB <- glmmTMB(
+  real_consume ~ substrate * day_c + (1 | colony),
+  dispformula = ~ substrate, # ajusta a dispersão por substrato
+  family = Gamma(link = "log"),
+  data = foraging_exp1
+)
+
+# Validar com DHARMa
+plot(simulateResiduals(modelo_glmmTMB))
+
+# Modelo com melhor ajuste
+
+# ANOVA tipo III para o modelo
+Anova(modelo_glmmTMB, type = "III")
+
+# Como a interação deu significativa (p = 0.011), devemos desdobrar a interação para entender como a taxa de consumo muda ao longo dos dias dentro de cada substrato.
+
+# Testar se a inclinação (tendência ao longo dos dias) é diferente entre substratos
+emtrends(modelo_glmmTMB, pairwise ~ substrate, var = "day_c")
+
+#Houve uma interação significativa entre o substrato e os dias de experimento (p = 0,0114). As colônias mantiveram um consumo constante de substrato no grupo controle ao longo do tempo (day_c.trend = 0,0002, p > 0,05). Em contrapartida, no tratamento com Tropaeolum, o consumo reduziu significativamente ao longo dos dias (day_c.trend = -0,1247, p < 0,05), indicando uma rejeição gradual ou um efeito de saciedade/repulsa acumulada ao longo do tempo.
+```
+
+Foraging activity differed between substrates and changed differently over time. A generalized linear mixed-effects model (GLMM) with a Gamma distribution and substrate-specific dispersion structure revealed a significant main effect of substrate on consumption (Type III Wald $\chi^2$ test, $\chi^2_1 = 20.48$, $P < 0.001$) and a significant substrate × day interaction ($\chi^2_1 = 6.40$, $P = 0.0114$), whereas the main effect of day was not significant ($\chi^2_1 = 0.0076$, $P = 0.931$). Estimated marginal trends indicated that consumption remained stable over time on the control substrate ($\text{slope} = 0.0002$ log-units/day, $SE = 0.0024$, $P > 0.05$), whereas it decreased significantly over time on *Tropaeolum majus* ($\text{slope} = -0.1247$ log-units/day, $SE = 0.0493$, $P < 0.05$). Accordingly, temporal slopes differed significantly between substrates ($z = 2.53$, $P = 0.0114$). Model diagnostics using simulated quantile residuals indicated no evidence of residual deviation, overdispersion, or outliers (Kolmogorov–Smirnov test, $P = 0.486$).
 
 #### Visualizing the data
 
 Daily Foraging Dynamics
 
 ```{r}
-#extraindo as predições do modelo para o gráfico
+# Extraindo predições na escala original (gramas)
+emm_dias <- emmeans(
+  modelo_glmmTMB, 
+  ~ substrate * day_c, 
+  at = list(day_c = 0:6)
+) %>% 
+  regrid()
+
+# Preparando o data.frame e padronizando os nomes das colunas
 preditos_df <- as.data.frame(emm_dias) %>%
+  rename_with(~ "emmean", any_of("response")) %>%
+  rename_with(~ "lower.CL", any_of("asymp.LCL")) %>%
+  rename_with(~ "upper.CL", any_of("asymp.UCL")) %>%
   mutate(day_num = day_c + 1)
 
-#gráfico do consumo observado e das predições do modelo
 forrageamento <- ggplot() +
+  # Trajetórias individuais das colônias
   geom_line(
     data = foraging_exp1,
     aes(
@@ -169,11 +208,11 @@ forrageamento <- ggplot() +
       group = colony,
       color = substrate
     ),
-    alpha = 0.35,
+    alpha = 0.30,
     linetype = "dashed",
-    linewidth = 0.7
+    linewidth = 0.6
   ) +
-  #intervalo de confiança de 95% das médias estimadas
+  # Intervalo de confiança de 95% do GLMM
   geom_ribbon(
     data = preditos_df,
     aes(
@@ -183,9 +222,9 @@ forrageamento <- ggplot() +
       fill = substrate,
       group = substrate
     ),
-    alpha = 0.2
+    alpha = 0.20
   ) +
-  #linha das médias ajustadas pelo modelo misto
+  # Linha das médias ajustadas
   geom_line(
     data = preditos_df,
     aes(
@@ -196,7 +235,7 @@ forrageamento <- ggplot() +
     ),
     linewidth = 1.2
   ) +
-  #pontos das médias ajustadas
+  # Pontos das médias ajustadas
   geom_point(
     data = preditos_df,
     aes(
@@ -206,33 +245,38 @@ forrageamento <- ggplot() +
     ),
     size = 3
   ) +
-  #eixo x
+  # Eixo X
   scale_x_continuous(breaks = 1:7) +
-  #cores dos substratos
+  # Cores e legenda
   scale_color_manual(
     values = c(
       "control" = rgb(41, 51, 92, maxColorValue = 255),
       "tropaeolum" = rgb(219, 43, 57, maxColorValue = 255)
     ),
-    name = "Substrate"
+    name = "Substrate",
+    labels = c("control" = "Control", "tropaeolum" = expression(italic("T. majus")))
   ) +
   scale_fill_manual(
     values = c(
       "control" = rgb(41, 51, 92, maxColorValue = 255),
       "tropaeolum" = rgb(219, 43, 57, maxColorValue = 255)
     ),
-    name = "Substrate"
+    name = "Substrate",
+    labels = c("control" = "Control", "tropaeolum" = expression(italic("T. majus")))
   ) +
-  #rótulos
+  # Rótulos dos eixos e estatística da interação
   labs(
     x = "Exposure Time (Days)",
-    y = "Consumption (g)") +
-  #tema
+    y = "Consumption (g)",
+    subtitle = expression(paste("Substrate × Exposure Time interaction: ", chi^2, " = 6.40, ", italic(P), " = 0.011"))
+  ) +
+  # Tema
   theme_classic(base_size = 12) +
   theme(
     legend.position = "right",
-    plot.title = element_text(face = "bold", size = 14),
-    axis.title = element_text(face = "bold")
+    legend.title = element_text(face = "bold"),
+    axis.title = element_text(face = "bold"),
+    plot.subtitle = element_text(size = 10, color = "gray25")
   )
 
 print(forrageamento)
@@ -240,41 +284,209 @@ print(forrageamento)
 
 Model-estimated means ± 95% CI. Dashed lines represent individual colonies.
 
-### Survival curves (Kaplan-Meier)
+## Waste production data
+
+### Descritive statistics
+
+```{r}
+# Waste production
+
+#estatística descritiva
+descritiva_waste <- foraging_exp1 %>%
+  group_by(substrate, day) %>%
+  summarise(
+    n = n(),
+    media = mean(waste, na.rm = TRUE),
+    sd = sd(waste, na.rm = TRUE),
+    se = sd(waste, na.rm = TRUE) / sqrt(n),
+    mediana = median(waste, na.rm = TRUE),
+    .groups = "drop"
+  )
+
+descritiva_waste
+
+#histograma
+ggplot(foraging_exp1, aes(x = waste, fill = substrate)) +
+  geom_histogram(bins = 10, alpha = 0.4) +
+  labs(x = "Waste production", y = "Frequency")
+
+#dispersion 
+ggplot(foraging_exp1, aes(x = day, y = waste, color = substrate, group = colony)) +
+  geom_line(alpha = 0.5) +
+  geom_point(size = 3) +
+  labs(x = "Day", y = "Waste production")
+```
+
+### Inferencial statistics
+
+```{r}
+#centralização da variável para estabelecer o dia 1 como o tempo 0
+waste_exp1 <- foraging_exp1 %>%
+  mutate(day_c = day - 1)
+
+#ajustando o modelo linear misto
+modelo_waste <- lmer(
+  waste ~ substrate * day_c + (1 | colony),
+  data = foraging_exp1
+)
+plot(modelo_waste)
+
+# leve formato de funil que se abre da esquerda para a direita, indicando que a variância na produção de lixo aumenta à medida que a quantidade média predita de lixo cresce.
+
+#verificando a normalidade dos resíduos do modelo
+print(shapiro.test(residuals(modelo_waste)))
+
+qqnorm(residuals(modelo_waste))
+qqline(residuals(modelo_waste))
+
+simres <- simulateResiduals(modelo_waste)
+plot(simres)
+
+# O modelo linear misto é adequado para esses dados de produção de lixo.
+
+Anova(modelo_waste, type = "III")
+
+```
+
+In contrast to foraging activity, waste production did not differ between substrates or change over time. The linear mixed-effects model showed no significant main effect of substrate (Type III Wald $\chi^2$ test, $\chi^2_1 = 1.89$, $P = 0.169$) or exposure time ($\chi^2_1 = 1.20$, $P = 0.274$), and no significant substrate × day interaction ($\chi^2_1 = 0.068$, $P = 0.795$). These results indicate that waste accumulation remained baseline and uniform across both experimental conditions throughout the 7-day period.
+
+#### Visualizing the data
+
+Daily Waste Production Dynamics
+
+```{r}
+# Extraindo predições do modelo
+emm_lixo_dias <- emmeans(
+  modelo_waste, 
+  ~ substrate * day_c, 
+  at = list(day_c = 0:6)
+)
+
+# Preparando o data.frame e padronizando as colunas
+preditos_lixo_df <- as.data.frame(emm_lixo_dias) %>%
+  rename_with(~ "emmean", any_of("emmean")) %>%
+  rename_with(~ "lower.CL", any_of(c("lower.CL", "asymp.LCL"))) %>%
+  rename_with(~ "upper.CL", any_of(c("upper.CL", "asymp.UCL"))) %>%
+  mutate(day_num = day_c + 1)
+
+# Construção do gráfico
+lixo_plot <- ggplot() +
+  # Trajetórias individuais das colônias (dados observados)
+  geom_line(
+    data = foraging_exp1,
+    aes(
+      x = day,
+      y = waste,
+      group = colony,
+      color = substrate
+    ),
+    alpha = 0.30,
+    linetype = "dashed",
+    linewidth = 0.6
+  ) +
+  # Intervalo de confiança de 95% do modelo LMM
+  geom_ribbon(
+    data = preditos_lixo_df,
+    aes(
+      x = day_num,
+      ymin = lower.CL,
+      ymax = upper.CL,
+      fill = substrate,
+      group = substrate
+    ),
+    alpha = 0.20
+  ) +
+  # Linha das médias ajustadas
+  geom_line(
+    data = preditos_lixo_df,
+    aes(
+      x = day_num,
+      y = emmean,
+      color = substrate,
+      group = substrate
+    ),
+    linewidth = 1.2
+  ) +
+  # Pontos das médias ajustadas
+  geom_point(
+    data = preditos_lixo_df,
+    aes(
+      x = day_num,
+      y = emmean,
+      color = substrate
+    ),
+    size = 3
+  ) +
+  # Eixo X
+  scale_x_continuous(breaks = 1:7) +
+  # Cores e legenda
+  scale_color_manual(
+    values = c(
+      "control" = rgb(41, 51, 92, maxColorValue = 255),
+      "tropaeolum" = rgb(219, 43, 57, maxColorValue = 255)
+    ),
+    name = "Substrate",
+    labels = c("control" = "Control", "tropaeolum" = expression(italic("T. majus")))
+  ) +
+  scale_fill_manual(
+    values = c(
+      "control" = rgb(41, 51, 92, maxColorValue = 255),
+      "tropaeolum" = rgb(219, 43, 57, maxColorValue = 255)
+    ),
+    name = "Substrate",
+    labels = c("control" = "Control", "tropaeolum" = expression(italic("T. majus")))
+  ) +
+  # Rótulos dos eixos e estatística da interação
+  labs(
+    x = "Exposure Time (Days)",
+    y = "Waste Production (g)",
+    subtitle = expression(paste("Substrate × Exposure Time interaction: ", chi^2, " = 0.068, ", italic(P), " = 0.795"))
+  ) +
+  # Tema visual
+  theme_classic(base_size = 12) +
+  theme(
+    legend.position = "right",
+    legend.title = element_text(face = "bold"),
+    axis.title = element_text(face = "bold"),
+    plot.subtitle = element_text(size = 10, color = "gray25")
+  )
+
+print(lixo_plot)
+```
+
+Model-estimated means ± 95% CI. Dashed lines represent individual colonies.
+
+## Survival curves (Kaplan-Meier)
+
+Survival data were evaluated using time-to-event analysis in R. Prior to inferential modeling, the proportional hazards assumption was assessed for all covariates using Schoenfeld residual diagnostics (cox.zph function in the survival package). The chemical positive control (isocycloseram) induced complete mortality within 48 h, causing a significant violation of proportional hazards ($\chi^2 = 35.43, P < 0.001$). Because this treatment served strictly as a technical validation control, it was excluded from further inferential modeling to ensure statistical validity. In the remaining dataset comprising fungal isolates and negative controls, proportional hazards assumptions were fully met (global Schoenfeld test, $\chi^2 = 10.34, P = 0.67$).
+
+Differences in survival rates were analyzed using a Mixed-Effects Cox Proportional Hazards model (coxme package). The model included substrate regime, fungal treatment, and their interaction (substrate * treatment) as fixed effects. Colony of origin was included as a random intercept (1 | colony) to account for potential non-independence among nestmates. Overall treatment effects were evaluated using Type III Wald $\chi^2$ tests (car package). Post-hoc pairwise comparisons of hazard ratios (HR) were performed using the emmeans package, applying Tukey's adjustment for multiple comparisons within and across substrate regimes.
 
 Reading and preparing the data.
 
 ```{r}
-dados <- read_excel("isolates_selection_bioassay_1.xlsx")
+isolate_selection <- read_excel("isolates_selection_bioassay_4.xlsx")
 
-#definindo as variáveis categóricas e criando um ID único por placa de Petri
-dados <- dados %>%
+# Definindo as variáveis categóricas
+isolate_selection <- isolate_selection %>%
   mutate(
     substrate = as.factor(substrate),
     treatment = as.factor(treatment),
-    inter     = as.factor(inter),
-    rep       = as.factor(rep),
-    id_placa  = as.factor(paste(inter, rep, sep = "_"))
-  )
+    inter     = as.factor(sub_treat))
 ```
 
-Survival data were analyzed using the Kaplan–Meier estimator to generate survival curves for each treatment combination. Survival time was defined as the number of days until death or the end of the observation period for individuals that survived, with mortality status recorded as the event variable. Differences among treatment-specific survival curves were assessed using the log-rank test. Kaplan–Meier curves were plotted with survival probability over time, with the corresponding overall significance value displayed on the graph.
-
 ```{r}
-#criando o objeto de sobrevivência
-surv_obj <- Surv(time = dados$dias, event = dados$mortality)
+# Criação das curvas
+fit_km <- survfit(Surv(day, mortality) ~ sub_treat, data = isolate_selection)
 
-#curvas de sobrevivência por tratamento de interação
-fit_km <- survfit(surv_obj ~ inter, data = dados)
-
-#teste de Log-Rank
-logrank_test <- survdiff(surv_obj ~ inter, data = dados)
+# Teste Log-Rank
+logrank_test <- survdiff(Surv(day, mortality) ~ sub_treat, data = isolate_selection)
 print(logrank_test)
 
-#plotando a curva de sobrevivência
+# Gráfico Kaplan-Meier Geral
 ggsurvplot(
   fit_km,
-  data = dados,
+  data = isolate_selection,
   pval = TRUE,
   risk.table = FALSE,
   legend.title = "Treatments",
@@ -284,43 +496,285 @@ ggsurvplot(
 )
 ```
 
-#### Mixed-effects Cox model (main effects + interaction)
-
-A mixed-effects Cox proportional hazards model was fitted using the `coxme` package to assess the effects of substrate, fungal treatment, and their interaction on *Atta sexdens* forager mortality risk over time. Petri-dish replicate (`id_placa`) was included as a random effect to account for the non-independence of individuals within the same experimental unit. The model estimated hazard ratios (HR) for each treatment effect, allowing the relative risk of mortality to be quantified while accounting for variation among experimental replicates.
+Facetando os gráficos para facilitar a visualização
 
 ```{r}
-fit_cox <- coxme(surv_obj ~ substrate * treatment + (1 | id_placa), data = dados)
-summary(fit_cox)
+# Importanto e convertendo para data.frame
+isolate_selection_facet <- read_excel("isolates_selection_bioassay_4.xlsx") %>%
+  mutate(
+    substrate = as.factor(substrate),
+    treatment = as.factor(treatment),
+    sub_treat = as.factor(sub_treat)
+  ) %>%
+  as.data.frame() # <-- Converte de tibble para data.frame clássico
 
-#modelo Cox sem efeito aleatório para verificar a proporcionalidade dos hazards
-cox_ph <- coxph(
-  surv_obj ~ substrate * treatment,
-  data = dados
+# Ajustando o modelo Kaplan-Meier com as variáveis separadas
+fit_km_sep <- survfit(
+  Surv(day, mortality) ~ treatment + substrate, 
+  data = isolate_selection_facet
 )
 
-#teste de Schoenfeld
-teste_ph <- cox.zph(cox_ph)
+# Gerando o gráfico facetado por substrato
+grafico_sobrevivencia <- ggsurvplot_facet(
+  fit_km_sep,
+  data = isolate_selection_facet,
+  facet.by = "substrate",
+  palette = "Dark2",            # Paleta de cores para os tratamentos
+  pval = TRUE,                 # Exibe o p-valor
+  xlab = "Days post-inoculation",
+  ylab = "Survival probability",
+  legend.title = "Treatment",
+  ggtheme = theme_minimal()
+)
 
+print(grafico_sobrevivencia)
+```
+
+#### Mixed-effects Cox model (main effects + interaction)
+
+```{r}
+# Diagnóstico da Premissa de Riscos Proporcionais
+
+# Modelo Cox padrão para teste PH (com controle positivo)
+cox_ph <- coxph(Surv(day, mortality) ~ substrate * treatment, data = isolate_selection)
+teste_ph <- cox.zph(cox_ph)
 print(teste_ph)
 
-#gráfico dos resíduos de Schoenfeld
-plot(teste_ph)
+# Aqui existe uma violação devido ao controle positivo que causa alta mortalidade em pouco tempo
+
+# Filtrando o controle positivo e retestando PH
+dados_sem_join <- isolate_selection %>%
+  filter(treatment != "join") %>%
+  droplevels()
+
+cox_sem_join <- coxph(Surv(day, mortality) ~ substrate * treatment, data = dados_sem_join)
+teste_ph_sem_join <- cox.zph(cox_sem_join)
+print(teste_ph_sem_join) 
+
+# Confirma que a premissa foi atendida
+
+# Modelo Misto de Cox Final (coxme) e Pós-Hoc
+fit_coxme_final <- coxme(
+  Surv(day, mortality) ~ substrate * treatment + (1 | colony),
+  data = dados_sem_join
+)
+
+# ANOVA Tipo III
+Anova(fit_coxme_final, type = "III")
+
+# Comparações de pares via Hazard Ratios
+
+# Compara tratamentos dentro de cada substrato
+emmeans(fit_coxme_final, pairwise ~ treatment | substrate, type = "response")
+
+# Compara substratos dentro de cada tratamento
+emmeans(fit_coxme_final, pairwise ~ substrate | treatment, type = "response")
 ```
+
+Final graph
+
+```{r}
+# Preparação e ajuste do modelo (sem o controle positivo)
+dados_plot <- isolate_selection %>%
+  filter(treatment != "join") %>%
+  mutate(
+    substrate_label = factor(
+      substrate,
+      levels = c("cont", "chag"),
+      labels = c("Acalypha wilkesiana", "Tropaeolum majus")
+    ),
+    treatment_label = factor(
+      treatment,
+      levels = c("cont", "twee", "i15", "i33", "i94", "i103", "i124"),
+      labels = c("Control", "Tween 80", "Isolate 15", "Isolate 33", "Isolate 94", "Isolate 103", "Isolate 124")
+    )
+  )
+
+fit_plot <- survfit(Surv(day, mortality) ~ treatment_label + substrate_label, data = dados_plot)
+
+# Extração dos dados para o ggplot
+df_surv <- tidy(fit_plot) %>%
+  separate(strata, into = c("treatment_label", "substrate_label"), sep = ", ") %>%
+  mutate(
+    treatment_label = gsub("treatment_label=", "", treatment_label),
+    substrate_label = gsub("substrate_label=", "", substrate_label)
+  )
+
+df_zeros <- expand.grid(
+  time = 0,
+  estimate = 1,
+  treatment_label = unique(df_surv$treatment_label),
+  substrate_label = unique(df_surv$substrate_label)
+)
+
+df_surv_complete <- bind_rows(df_zeros, df_surv)
+
+# Gráfico final
+p_pub <- ggplot(
+  df_surv_complete, 
+  aes(x = time, y = estimate, color = treatment_label, linetype = treatment_label, shape = treatment_label)
+) +
+  geom_step(linewidth = 0.8) +
+  geom_point(size = 2.2) + 
+  facet_wrap(~ substrate_label, ncol = 2) +
+  scale_x_continuous(breaks = seq(0, max(df_surv_complete$time), by = 1), limits = c(0, max(df_surv_complete$time))) +
+  scale_y_continuous(limits = c(0, 1.02), labels = scales::percent_format(accuracy = 1)) +
+  scale_color_manual(values = c("Control" = "black", "Tween 80" = "gray40", 
+                                "Isolate 15" = "#55DDE0", "Isolate 33" = "#33658A", 
+                                "Isolate 94" = "#2F4858", "Isolate 103" = "#F6AE2D", 
+                                "Isolate 124" = "#F26419")) +
+  # Estilos de Linha
+  scale_linetype_manual(values = c("Control" = "dashed", "Tween 80" = "dotted", 
+                                  "Isolate 15" = "solid", "Isolate 33" = "solid", 
+                                  "Isolate 94" = "solid", "Isolate 103" = "solid", 
+                                  "Isolate 124" = "solid")) +
+  scale_shape_manual(values = c("Control" = 16,
+                                "Tween 80" = 16,
+                                "Isolate 15" = 16,
+                                "Isolate 33" = 16,
+                                "Isolate 94" = 16,
+                                "Isolate 103" = 16,
+                                "Isolate 124" = 16)) +
+  labs(
+    x = "Time post-inoculation (days)",
+    y = "Survival probability",
+    color = "Treatment",
+    linetype = "Treatment",
+    shape = "Treatment"
+  ) +
+  theme_minimal(base_size = 12, base_family = "sans") +
+  theme(
+    strip.background = element_blank(),
+    strip.text = element_text(face = "italic", size = 11),
+    axis.title = element_text(face = "bold"),
+    axis.text = element_text(color = "black"),
+    legend.position = "bottom",
+    legend.title = element_text(face = "bold"),
+    legend.box = "horizontal",
+    panel.grid.major.y = element_line(color = "gray90", linewidth = 0.2)
+  ) +
+  guides(color = guide_legend(nrow = 2, byrow = TRUE))
+
+print(p_pub)
+```
+
+```{r}
+# Preparação e ajuste do modelo (sem o controle positivo)
+dados_plot <- isolate_selection %>%
+  filter(treatment != "join") %>%
+  mutate(
+    substrate_label = factor(
+      substrate,
+      levels = c("cont", "chag"),
+      labels = c("Acalypha wilkesiana", "Tropaeolum majus")
+    ),
+    treatment_label = factor(
+      treatment,
+      levels = c("cont", "twee", "i15", "i33", "i94", "i103", "i124"),
+      labels = c("Control", "Tween 80", "Isolate 15", "Isolate 33", "Isolate 94", "Isolate 103", "Isolate 124")
+    )
+  )
+
+fit_plot <- survfit(Surv(day, mortality) ~ treatment_label + substrate_label, data = dados_plot)
+
+# Extração dos dados para o ggplot
+df_surv <- tidy(fit_plot) %>%
+  separate(strata, into = c("treatment_label", "substrate_label"), sep = ", ") %>%
+  mutate(
+    treatment_label = gsub("treatment_label=", "", treatment_label),
+    substrate_label = gsub("substrate_label=", "", substrate_label)
+  )
+
+df_zeros <- expand.grid(
+  time = 0,
+  estimate = 1,
+  treatment_label = unique(df_surv$treatment_label),
+  substrate_label = unique(df_surv$substrate_label)
+)
+
+df_surv_complete <- bind_rows(df_zeros, df_surv)
+
+# Gráfico final
+p_pub <- ggplot(
+  df_surv_complete, 
+  aes(x = time, y = estimate, color = treatment_label, linetype = treatment_label, shape = treatment_label)
+) +
+  geom_step(linewidth = 0.8) +
+  geom_point(size = 2.2) + 
+  facet_wrap(~ substrate_label, ncol = 2) +
+  scale_x_continuous(breaks = seq(0, max(df_surv_complete$time), by = 1), limits = c(0, max(df_surv_complete$time))) +
+  scale_y_continuous(limits = c(0, 1.02), labels = scales::percent_format(accuracy = 1)) +
+  scale_color_manual(values = c("Control" = "black", "Tween 80" = "gray40", 
+                                "Isolate 15" = "#55DDE0", "Isolate 33" = "#33658A", 
+                                "Isolate 94" = "#2F4858", "Isolate 103" = "#F6AE2D", 
+                                "Isolate 124" = "#F26419")) +
+  scale_linetype_manual(values = c("Control" = "dashed", "Tween 80" = "dotted", 
+                                  "Isolate 15" = "solid", "Isolate 33" = "solid", 
+                                  "Isolate 94" = "solid", "Isolate 103" = "solid", 
+                                  "Isolate 124" = "solid")) +
+  scale_shape_manual(values = c("Control" = 16,
+                                "Tween 80" = 16,
+                                "Isolate 15" = 16,
+                                "Isolate 33" = 16,
+                                "Isolate 94" = 16,
+                                "Isolate 103" = 16,
+                                "Isolate 124" = 16)) +
+  labs(
+    x = "Time post-inoculation (days)",
+    y = "Survival probability",
+    color = "Treatment",
+    linetype = "Treatment",
+    shape = "Treatment"
+  ) +
+  theme_minimal(base_size = 12, base_family = "sans") +
+  theme(
+    strip.background = element_blank(),
+    strip.text = element_text(face = "italic", size = 11),
+    axis.title = element_text(face = "bold"),
+    axis.text = element_text(color = "black"),
+    legend.position = c(0.1, 0.20),
+    legend.title = element_text(face = "bold", size = 10),
+    legend.text = element_text(size = 9),
+    legend.background = element_rect(fill = alpha("white", 0.7), color = NA),
+    legend.key.height = unit(0.4, "cm"),
+    panel.grid.major.y = element_line(color = "gray90", linewidth = 0.2)
+  ) +
+  guides(
+    color = guide_legend(ncol = 1),
+    linetype = guide_legend(ncol = 1),
+    shape = guide_legend(ncol = 1)
+  )
+
+print(p_pub)
+```
+
+Survival of *A. sexdens* foragers was significantly influenced by both the fungal isolate (Type III Wald $\chi^2$ test: $\chi^2_6 = 15.18, P = 0.0189$) and the pre-exposure substrate regime ($\chi^2_1 = 8.95, P = 0.0028$). The substrate $\times$ treatment interaction was not statistically significant ($\chi^2_6 = 8.05, P = 0.2343$).
+
+Pre-exposure to *T. majus* significantly reduced baseline worker survival compared to the control substrate (*A. wilkesiana*). In non-inoculated controls, ants exposed to *T. majus* exhibited a 4.25-fold increase in mortality hazard relative to those maintained on the control diet ($z = 2.99, P = 0.0028$).
+
+Under standard control substrate conditions, isolate 15 was the most virulent, causing a significant 4.31-fold increase in mortality hazard compared to non-inoculated controls ($z = 3.04, P = 0.0377$). Isolate 94 also displayed elevated hazard rates under control conditions, though this trend was marginal ($HR = 3.89, z = 2.80, P = 0.0752$).
+
+When fungal exposure was combined with *T. majus* pre-exposure, mortality hazards increased overall. Isolate 33 exhibited a high absolute hazard rate on the *T. majus* substrate, with worker hazard increasing 3.37-fold compared to the same isolate on the control substrate ($z = 3.42, P = 0.0006$). Pre-exposure to *T. majus* also heightened mortality hazards for isolates 124 ($HR = 2.68, P = 0.0184$) and 94 ($HR = 2.00, P = 0.0492$). Conversely, isolate 15 maintained consistently high virulence across diets ($HR = 1.12, P = 0.7497$), demonstrating high intrinsic pathogenicity regardless of substrate-induced stress.
 
 #### Median lethal time (LT₅₀) estimation
 
-Median lethal time (LT₅₀) was estimated from the Kaplan–Meier survival curves by determining the time at which the estimated survival probability reached 50% for each treatment group. The resulting LT₅₀ values were organized into a table to facilitate comparisons of median survival time among treatment combinations.
+Median lethal time ($LT_{50}$) and its corresponding 95% confidence intervals were estimated directly from non-parametric Kaplan–Meier survival curves by determining the time at which the estimated survival probability reached 50% for each treatment group.
 
 ```{r}
-lt50_matrix <- quantile(fit_km, probs = 0.5)$quantile
+lt50_matrix <- quantile(fit_km, probs = 0.5)
 
 lt50_table <- data.frame(
-  Treatment_Group = gsub("inter=", "", rownames(lt50_matrix)),
-  LT50_days = lt50_matrix[, 1],
-  row.names = NULL
+  Treatment_Group = gsub(".*=", "", rownames(lt50_matrix$quantile)),
+  LT50_days       = lt50_matrix$quantile[, 1],
+  CI_lower_95     = lt50_matrix$lower[, 1],
+  CI_upper_95     = lt50_matrix$upper[, 1],
+  row.names       = NULL
 )
 
 print(lt50_table)
 ```
 
-Fungal treatment effects on *A. sexdens* forager mortality risk were substrate-dependent for specific isolates (mixed-effects Cox proportional hazards model, integrated likelihood ratio χ² = 75.65, df = 16, p \< 0.001). The model revealed significant substrate × fungal treatment interactions for i94 (HR = 4.70, z = 2.51, p = 0.0122) and Tween (HR = 3.48, z = 2.07, p = 0.0386), indicating that their effects on mortality risk differed between substrates. Specifically, exposure to isolate i94 on *Tropaeolum majus* substrate showed a significantly stronger mortality hazard relative to its effect on the control substrate. On the control substrate, isolate i33 displayed the highest significant independent effect on mortality risk (HR = 2.59, z = 2.28, p = 0.0223). The main effect of substrate was not significant (HR = 1.16, z = 0.35, p = 0.724), indicating that substrate alone did not consistently alter mortality risk. Median lethal time (LT₅₀) varied among treatment combinations, ranging from 2 to 4 days, with the longest LT₅₀ observed for control–i94 and *T. majus*–i103. Overall, these results indicate that substrate modified the effects of specific fungal treatments on *A. sexdens* forager mortality rather than producing a consistent effect across all treatments.
+Median lethal time ($LT_{50}$) estimates derived from Kaplan–Meier survival curves further highlighted the differential speed of kill among treatment combinations. The chemical positive control (*isocycloseram*) demonstrated the fastest mortality, reaching 50% mortality within 1.0 day regardless of substrate regime ($95\%\text{ CI: } 1.0–1.0$). In non-inoculated negative controls, worker survival remained high on the control diet (*A. wilkesiana*), with mortality failing to reach 50% during the observation period ($LT_{50} = \text{Not Reached, NR}$). In contrast, pre-exposure to *T. majus* alone markedly reduced survival, resulting in an $LT_{50}$ of 3.0 days ($95\%\text{ CI: } 2.0–\text{NR}$).
+
+Under control substrate conditions (*A. wilkesiana*), fungal isolate **15** exhibited the shortest median lethal time among biological treatments ($LT_{50} = 3.5\text{ days}, 95\%\text{ CI: } 3.0–5.0$), followed by **94** ($LT_{50} = 4.0\text{ days}, 95\%\text{ CI: } 2.0–\text{NR}$). When fungal exposure was combined with *T. majus* pre-exposure, speed of kill was further accelerated; isolate **33** achieved the overall shortest median lethal time ($LT_{50} = 2.0\text{ days}, 95\%\text{ CI: } 2.0–4.0$), followed closely by **94** ($LT_{50} = 2.5\text{ days}, 95\%\text{ CI: } 2.0–4.0$) and **15** ($LT_{50} = 3.0\text{ days}, 95\%\text{ CI: } 2.0–5.0$).
+
