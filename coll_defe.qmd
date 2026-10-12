@@ -460,7 +460,7 @@ Model-estimated means ± 95% CI. Dashed lines represent individual colonies.
 
 Survival data were evaluated using time-to-event analysis in R. Prior to inferential modeling, the proportional hazards assumption was assessed for all covariates using Schoenfeld residual diagnostics (cox.zph function in the survival package). The chemical positive control (isocycloseram) induced complete mortality within 48 h, causing a significant violation of proportional hazards ($\chi^2 = 35.43, P < 0.001$). Because this treatment served strictly as a technical validation control, it was excluded from further inferential modeling to ensure statistical validity. In the remaining dataset comprising fungal isolates and negative controls, proportional hazards assumptions were fully met (global Schoenfeld test, $\chi^2 = 10.34, P = 0.67$).
 
-Differences in survival rates were analyzed using a Mixed-Effects Cox Proportional Hazards model (coxme package). The model included substrate regime, fungal treatment, and their interaction (substrate * treatment) as fixed effects. Colony of origin was included as a random intercept (1 | colony) to account for potential non-independence among nestmates. Overall treatment effects were evaluated using Type III Wald $\chi^2$ tests (car package). Post-hoc pairwise comparisons of hazard ratios (HR) were performed using the emmeans package, applying Tukey's adjustment for multiple comparisons within and across substrate regimes.
+Differences in survival rates were analyzed using a Mixed-Effects Cox Proportional Hazards model (coxme package). The model included substrate regime, fungal treatment, and their interaction (substrate \* treatment) as fixed effects. Colony of origin was included as a random intercept (1 \| colony) to account for potential non-independence among nestmates. Overall treatment effects were evaluated using Type III Wald $\chi^2$ tests (car package). Post-hoc pairwise comparisons of hazard ratios (HR) were performed using the emmeans package, applying Tukey's adjustment for multiple comparisons within and across substrate regimes.
 
 Reading and preparing the data.
 
@@ -530,133 +530,7 @@ grafico_sobrevivencia <- ggsurvplot_facet(
 print(grafico_sobrevivencia)
 ```
 
-#### Mixed-effects Cox model (main effects + interaction)
-
-```{r}
-# Diagnóstico da Premissa de Riscos Proporcionais
-
-# Modelo Cox padrão para teste PH (com controle positivo)
-cox_ph <- coxph(Surv(day, mortality) ~ substrate * treatment, data = isolate_selection)
-teste_ph <- cox.zph(cox_ph)
-print(teste_ph)
-
-# Aqui existe uma violação devido ao controle positivo que causa alta mortalidade em pouco tempo
-
-# Filtrando o controle positivo e retestando PH
-dados_sem_join <- isolate_selection %>%
-  filter(treatment != "join") %>%
-  droplevels()
-
-cox_sem_join <- coxph(Surv(day, mortality) ~ substrate * treatment, data = dados_sem_join)
-teste_ph_sem_join <- cox.zph(cox_sem_join)
-print(teste_ph_sem_join) 
-
-# Confirma que a premissa foi atendida
-
-# Modelo Misto de Cox Final (coxme) e Pós-Hoc
-fit_coxme_final <- coxme(
-  Surv(day, mortality) ~ substrate * treatment + (1 | colony),
-  data = dados_sem_join
-)
-
-# ANOVA Tipo III
-Anova(fit_coxme_final, type = "III")
-
-# Comparações de pares via Hazard Ratios
-
-# Compara tratamentos dentro de cada substrato
-emmeans(fit_coxme_final, pairwise ~ treatment | substrate, type = "response")
-
-# Compara substratos dentro de cada tratamento
-emmeans(fit_coxme_final, pairwise ~ substrate | treatment, type = "response")
-```
-
 Final graph
-
-```{r}
-# Preparação e ajuste do modelo (sem o controle positivo)
-dados_plot <- isolate_selection %>%
-  filter(treatment != "join") %>%
-  mutate(
-    substrate_label = factor(
-      substrate,
-      levels = c("cont", "chag"),
-      labels = c("Acalypha wilkesiana", "Tropaeolum majus")
-    ),
-    treatment_label = factor(
-      treatment,
-      levels = c("cont", "twee", "i15", "i33", "i94", "i103", "i124"),
-      labels = c("Control", "Tween 80", "Isolate 15", "Isolate 33", "Isolate 94", "Isolate 103", "Isolate 124")
-    )
-  )
-
-fit_plot <- survfit(Surv(day, mortality) ~ treatment_label + substrate_label, data = dados_plot)
-
-# Extração dos dados para o ggplot
-df_surv <- tidy(fit_plot) %>%
-  separate(strata, into = c("treatment_label", "substrate_label"), sep = ", ") %>%
-  mutate(
-    treatment_label = gsub("treatment_label=", "", treatment_label),
-    substrate_label = gsub("substrate_label=", "", substrate_label)
-  )
-
-df_zeros <- expand.grid(
-  time = 0,
-  estimate = 1,
-  treatment_label = unique(df_surv$treatment_label),
-  substrate_label = unique(df_surv$substrate_label)
-)
-
-df_surv_complete <- bind_rows(df_zeros, df_surv)
-
-# Gráfico final
-p_pub <- ggplot(
-  df_surv_complete, 
-  aes(x = time, y = estimate, color = treatment_label, linetype = treatment_label, shape = treatment_label)
-) +
-  geom_step(linewidth = 0.8) +
-  geom_point(size = 2.2) + 
-  facet_wrap(~ substrate_label, ncol = 2) +
-  scale_x_continuous(breaks = seq(0, max(df_surv_complete$time), by = 1), limits = c(0, max(df_surv_complete$time))) +
-  scale_y_continuous(limits = c(0, 1.02), labels = scales::percent_format(accuracy = 1)) +
-  scale_color_manual(values = c("Control" = "black", "Tween 80" = "gray40", 
-                                "Isolate 15" = "#55DDE0", "Isolate 33" = "#33658A", 
-                                "Isolate 94" = "#2F4858", "Isolate 103" = "#F6AE2D", 
-                                "Isolate 124" = "#F26419")) +
-  # Estilos de Linha
-  scale_linetype_manual(values = c("Control" = "dashed", "Tween 80" = "dotted", 
-                                  "Isolate 15" = "solid", "Isolate 33" = "solid", 
-                                  "Isolate 94" = "solid", "Isolate 103" = "solid", 
-                                  "Isolate 124" = "solid")) +
-  scale_shape_manual(values = c("Control" = 16,
-                                "Tween 80" = 16,
-                                "Isolate 15" = 16,
-                                "Isolate 33" = 16,
-                                "Isolate 94" = 16,
-                                "Isolate 103" = 16,
-                                "Isolate 124" = 16)) +
-  labs(
-    x = "Time post-inoculation (days)",
-    y = "Survival probability",
-    color = "Treatment",
-    linetype = "Treatment",
-    shape = "Treatment"
-  ) +
-  theme_minimal(base_size = 12, base_family = "sans") +
-  theme(
-    strip.background = element_blank(),
-    strip.text = element_text(face = "italic", size = 11),
-    axis.title = element_text(face = "bold"),
-    axis.text = element_text(color = "black"),
-    legend.position = "bottom",
-    legend.title = element_text(face = "bold"),
-    legend.box = "horizontal",
-    panel.grid.major.y = element_line(color = "gray90", linewidth = 0.2)
-  ) +
-  guides(color = guide_legend(nrow = 2, byrow = TRUE))
-
-print(p_pub)
-```
 
 ```{r}
 # Preparação e ajuste do modelo (sem o controle positivo)
@@ -748,6 +622,47 @@ p_pub <- ggplot(
 print(p_pub)
 ```
 
+#### Mixed-effects Cox model (main effects + interaction)
+
+```{r}
+# Diagnóstico da Premissa de Riscos Proporcionais
+
+# Modelo Cox padrão para teste PH (com controle positivo)
+cox_ph <- coxph(Surv(day, mortality) ~ substrate * treatment, data = isolate_selection)
+teste_ph <- cox.zph(cox_ph)
+print(teste_ph)
+
+# Aqui existe uma violação devido ao controle positivo que causa alta mortalidade em pouco tempo
+
+# Filtrando o controle positivo e retestando PH
+dados_sem_join <- isolate_selection %>%
+  filter(treatment != "join") %>%
+  droplevels()
+
+cox_sem_join <- coxph(Surv(day, mortality) ~ substrate * treatment, data = dados_sem_join)
+teste_ph_sem_join <- cox.zph(cox_sem_join)
+print(teste_ph_sem_join) 
+
+# Confirma que a premissa foi atendida
+
+# Modelo Misto de Cox Final (coxme) e Pós-Hoc
+fit_coxme_final <- coxme(
+  Surv(day, mortality) ~ substrate * treatment + (1 | colony),
+  data = dados_sem_join
+)
+
+# ANOVA Tipo III
+Anova(fit_coxme_final, type = "III")
+
+# Comparações de pares via Hazard Ratios
+
+# Compara tratamentos dentro de cada substrato
+emmeans(fit_coxme_final, pairwise ~ treatment | substrate, type = "response")
+
+# Compara substratos dentro de cada tratamento
+emmeans(fit_coxme_final, pairwise ~ substrate | treatment, type = "response")
+```
+
 Survival of *A. sexdens* foragers was significantly influenced by both the fungal isolate (Type III Wald $\chi^2$ test: $\chi^2_6 = 15.18, P = 0.0189$) and the pre-exposure substrate regime ($\chi^2_1 = 8.95, P = 0.0028$). The substrate $\times$ treatment interaction was not statistically significant ($\chi^2_6 = 8.05, P = 0.2343$).
 
 Pre-exposure to *T. majus* significantly reduced baseline worker survival compared to the control substrate (*A. wilkesiana*). In non-inoculated controls, ants exposed to *T. majus* exhibited a 4.25-fold increase in mortality hazard relative to those maintained on the control diet ($z = 2.99, P = 0.0028$).
@@ -777,4 +692,3 @@ print(lt50_table)
 Median lethal time ($LT_{50}$) estimates derived from Kaplan–Meier survival curves further highlighted the differential speed of kill among treatment combinations. The chemical positive control (*isocycloseram*) demonstrated the fastest mortality, reaching 50% mortality within 1.0 day regardless of substrate regime ($95\%\text{ CI: } 1.0–1.0$). In non-inoculated negative controls, worker survival remained high on the control diet (*A. wilkesiana*), with mortality failing to reach 50% during the observation period ($LT_{50} = \text{Not Reached, NR}$). In contrast, pre-exposure to *T. majus* alone markedly reduced survival, resulting in an $LT_{50}$ of 3.0 days ($95\%\text{ CI: } 2.0–\text{NR}$).
 
 Under control substrate conditions (*A. wilkesiana*), fungal isolate **15** exhibited the shortest median lethal time among biological treatments ($LT_{50} = 3.5\text{ days}, 95\%\text{ CI: } 3.0–5.0$), followed by **94** ($LT_{50} = 4.0\text{ days}, 95\%\text{ CI: } 2.0–\text{NR}$). When fungal exposure was combined with *T. majus* pre-exposure, speed of kill was further accelerated; isolate **33** achieved the overall shortest median lethal time ($LT_{50} = 2.0\text{ days}, 95\%\text{ CI: } 2.0–4.0$), followed closely by **94** ($LT_{50} = 2.5\text{ days}, 95\%\text{ CI: } 2.0–4.0$) and **15** ($LT_{50} = 3.0\text{ days}, 95\%\text{ CI: } 2.0–5.0$).
-
