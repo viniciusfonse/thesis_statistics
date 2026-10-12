@@ -622,7 +622,7 @@ p_pub <- ggplot(
 print(p_pub)
 ```
 
-#### Mixed-effects Cox model (main effects + interaction)
+### Mixed-effects Cox model (main effects + interaction)
 
 ```{r}
 # Diagnóstico da Premissa de Riscos Proporcionais
@@ -671,7 +671,7 @@ Under standard control substrate conditions, isolate 15 was the most virulent, c
 
 When fungal exposure was combined with *T. majus* pre-exposure, mortality hazards increased overall. Isolate 33 exhibited a high absolute hazard rate on the *T. majus* substrate, with worker hazard increasing 3.37-fold compared to the same isolate on the control substrate ($z = 3.42, P = 0.0006$). Pre-exposure to *T. majus* also heightened mortality hazards for isolates 124 ($HR = 2.68, P = 0.0184$) and 94 ($HR = 2.00, P = 0.0492$). Conversely, isolate 15 maintained consistently high virulence across diets ($HR = 1.12, P = 0.7497$), demonstrating high intrinsic pathogenicity regardless of substrate-induced stress.
 
-#### Median lethal time (LT₅₀) estimation
+### Median lethal time (LT₅₀) estimation
 
 Median lethal time ($LT_{50}$) and its corresponding 95% confidence intervals were estimated directly from non-parametric Kaplan–Meier survival curves by determining the time at which the estimated survival probability reached 50% for each treatment group.
 

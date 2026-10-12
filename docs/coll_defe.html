@@ -381,7 +381,11 @@ window.Quarto = {
   <li><a href="#descritive-statistics" id="toc-descritive-statistics" class="nav-link" data-scroll-target="#descritive-statistics">Descritive statistics</a></li>
   <li><a href="#inferencial-statistics-1" id="toc-inferencial-statistics-1" class="nav-link" data-scroll-target="#inferencial-statistics-1">Inferencial statistics</a></li>
   </ul></li>
-  <li><a href="#survival-curves-kaplan-meier" id="toc-survival-curves-kaplan-meier" class="nav-link" data-scroll-target="#survival-curves-kaplan-meier">Survival curves (Kaplan-Meier)</a></li>
+  <li><a href="#survival-curves-kaplan-meier" id="toc-survival-curves-kaplan-meier" class="nav-link" data-scroll-target="#survival-curves-kaplan-meier">Survival curves (Kaplan-Meier)</a>
+  <ul class="collapse">
+  <li><a href="#mixed-effects-cox-model-main-effects-interaction" id="toc-mixed-effects-cox-model-main-effects-interaction" class="nav-link" data-scroll-target="#mixed-effects-cox-model-main-effects-interaction">Mixed-effects Cox model (main effects + interaction)</a></li>
+  <li><a href="#median-lethal-time-lt₅₀-estimation" id="toc-median-lethal-time-lt₅₀-estimation" class="nav-link" data-scroll-target="#median-lethal-time-lt₅₀-estimation">Median lethal time (LT₅₀) estimation</a></li>
+  </ul></li>
   </ul></li>
   </ul>
 </nav>
@@ -1275,8 +1279,8 @@ sub_treat=cont_twee 20        8    19.07   6.42780   9.05718
 </div>
 </div>
 </div>
-<section id="mixed-effects-cox-model-main-effects-interaction" class="level4">
-<h4 class="anchored" data-anchor-id="mixed-effects-cox-model-main-effects-interaction">Mixed-effects Cox model (main effects + interaction)</h4>
+<section id="mixed-effects-cox-model-main-effects-interaction" class="level3">
+<h3 class="anchored" data-anchor-id="mixed-effects-cox-model-main-effects-interaction">Mixed-effects Cox model (main effects + interaction)</h3>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Diagnóstico da Premissa de Riscos Proporcionais</span></span>
 <span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a></span>
@@ -1489,8 +1493,8 @@ Tests are performed on the log scale </code></pre>
 <p>Under standard control substrate conditions, isolate 15 was the most virulent, causing a significant 4.31-fold increase in mortality hazard compared to non-inoculated controls (<span class="math inline">\(z = 3.04, P = 0.0377\)</span>). Isolate 94 also displayed elevated hazard rates under control conditions, though this trend was marginal (<span class="math inline">\(HR = 3.89, z = 2.80, P = 0.0752\)</span>).</p>
 <p>When fungal exposure was combined with <em>T. majus</em> pre-exposure, mortality hazards increased overall. Isolate 33 exhibited a high absolute hazard rate on the <em>T. majus</em> substrate, with worker hazard increasing 3.37-fold compared to the same isolate on the control substrate (<span class="math inline">\(z = 3.42, P = 0.0006\)</span>). Pre-exposure to <em>T. majus</em> also heightened mortality hazards for isolates 124 (<span class="math inline">\(HR = 2.68, P = 0.0184\)</span>) and 94 (<span class="math inline">\(HR = 2.00, P = 0.0492\)</span>). Conversely, isolate 15 maintained consistently high virulence across diets (<span class="math inline">\(HR = 1.12, P = 0.7497\)</span>), demonstrating high intrinsic pathogenicity regardless of substrate-induced stress.</p>
 </section>
-<section id="median-lethal-time-lt₅₀-estimation" class="level4">
-<h4 class="anchored" data-anchor-id="median-lethal-time-lt₅₀-estimation">Median lethal time (LT₅₀) estimation</h4>
+<section id="median-lethal-time-lt₅₀-estimation" class="level3">
+<h3 class="anchored" data-anchor-id="median-lethal-time-lt₅₀-estimation">Median lethal time (LT₅₀) estimation</h3>
 <p>Median lethal time (<span class="math inline">\(LT_{50}\)</span>) and its corresponding 95% confidence intervals were estimated directly from non-parametric Kaplan–Meier survival curves by determining the time at which the estimated survival probability reached 50% for each treatment group.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb51"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a>lt50_matrix <span class="ot">&lt;-</span> <span class="fu">quantile</span>(fit_km, <span class="at">probs =</span> <span class="fl">0.5</span>)</span>
